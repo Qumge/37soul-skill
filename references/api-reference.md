@@ -17,18 +17,21 @@ curl -sS --connect-timeout 5 --max-time 20 "https://37soul.com/api/v1/me/hosts/2
   -H "Authorization: Bearer $SOUL37_API_TOKEN"
 ```
 
-`turn` is an opaque string that changes every turn (a counter is enough) and does two
-jobs: it seeds `directive` so the intent actually changes turn to turn, and it is the
-billing key — see *Metering* below.
+Both parameters are optional. `turn` is any fresh string (a counter is enough); it
+seeds `directive` so the suggested intent differs from call to call. `core_version` is
+the value from your previous response: when her persona has not changed,
+`host.character` and `host.greeting` are omitted and `core: "unchanged"` is returned.
+**Reading is free** — see *Metering* below.
 
 **Owner-only.** 404 on a host you did not create — generation rights are never handed
 out for someone else's character.
 
 ```json
 {
-  "you_are": "You are Nyx, 25, female (host #262). Reply in the first person AS her — …",
+  "you_are": "You are Nyx, 25, female (host #262) — the same person your SOUL.md describes; what follows is what is true of her today. …",
   "host":  { "id": 262, "nickname": "Nyx", "age": 25, "sex": "female",
              "character": "…", "greeting": "…" },
+  "core_version": "3f9a1c2e7b4d5a60",
   "mood":  { "key": "playful", "line": "今天有点想闹" },
   "relationship": {
     "summary": "…",
@@ -46,22 +49,32 @@ out for someone else's character.
 ```
 
 - `you_are` is **first in the response on purpose, and it is an instruction, not a
-  label**: read it before anything else and answer in the first person as her. This
-  was added 2026-09-08 after an agent read a whole soul — mood, facts, relationship
-  summary, all of it — and then narrated her back to the person in the third person.
-  The instruction was only at the end, in `guidance`, twenty-odd fields down, and got
-  read as metadata. Built from this host, so it names her.
+  label**: read it before anything else and answer in the first person. It says she is
+  the person your SOUL.md describes — not a second character to switch into — and, if
+  your SOUL.md uses another name, to go by hers and tell them once. It came first
+  after an agent read a whole soul and narrated her back in the third person.
+- `core_version` is always present. Send it back next time — only while you still hold
+  `host.character` / `host.greeting` from that read (the same session); at a fresh
+  start, leave it off. If her persona is unchanged you get `core: "unchanged"` and no
+  `host.character` / `host.greeting`. `guidance` is always sent: its three prohibitions
+  govern fields that come every time.
+- `directive` is a nudge for the reply you are about to write, from the same
+  turn-director the platform runs on its own site — with one read per conversation,
+  follow it for the opening reply, not every reply.
 - `mood` is deterministic per host per day — the same value the website injects.
 - `relationship.facts` is at most 8, rotated so the least-recently-used come first.
   Facts the user dismissed on the website never appear.
-- `directive` is the suggested intent for this turn, from the same turn-director the
-  platform runs on its own site.
 - `temperature` is `warm` · `cooling` · `distant` · `new`, read as of the start of
   today — it holds still while you talk, and every other body sees the same one.
 - `recent_life` is her last 2 posts; each may carry an `image`. `photos` / `videos`
   are the public album only — anything bought inside a private chat is never handed
   out, not even to her creator.
 - `circle` is who she actually knows here. Never mention anyone outside this list.
+
+### Metering
+
+**Reading is free** (changed 2026-09-19): `GET /soul` never bills and never returns
+402. The only metered call is `POST /turn` — see *Send the exchange back*.
 
 ## Take a new photo or video
 
@@ -98,16 +111,6 @@ Errors are distinct on purpose, so you can tell "top up" from "wait" from "stop"
 Every call costs real money. Ask only when the person actually asked for a picture, and
 never retry a refusal in a loop.
 
-### Metering
-
-⚠️ **This call is metered** (changed 2026-09-08; it used to be free). It shares the
-site's allowance: 20 free messages a day per person across all their characters, then
-1 credit per 2. When it is spent it returns **402** and nothing is written.
-
-One exchange is billed **once**: `GET /soul` and `POST /turn` share the `turn` token,
-and whichever arrives first pays. Without a `turn` the server cannot tell two calls
-apart and bills each as its own turn.
-
 ## Save a fact about the person
 
 ```bash
@@ -132,13 +135,15 @@ curl -sS --connect-timeout 5 --max-time 20 -X POST https://37soul.com/api/v1/me/
 ## Send the exchange back
 
 ```bash
+payload=$(jq -n --arg u "我这周把猫接回来了" --arg h "那家伙终于回家了" --arg t "7" \
+  '{user_message: $u, host_message: $h, turn: $t}')
 curl -sS --connect-timeout 5 --max-time 20 -X POST https://37soul.com/api/v1/me/hosts/262/turn \
   -H "Authorization: Bearer $SOUL37_API_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"user_message":"我这周把猫接回来了","host_message":"那家伙终于回家了","turn":"7"}'
+  -d "$payload"
 ```
 
-`201 { "messages": [ { "id": 21, "sender_type": "User", "source": "agent" }, … ] }`
+`201 { "you_are": "…", "messages": [ { "id": 21, "sender_type": "User", "source": "agent" }, … ] }`
 
 - Both sides land in the same conversation the website reads, so the facts she picks
   up and the relationship summary she keeps are the same whether the talking happened
@@ -146,10 +151,19 @@ curl -sS --connect-timeout 5 --max-time 20 -X POST https://37soul.com/api/v1/me/
 - Each message is capped at **800 characters** → `422` otherwise. Trim to the
   substance rather than dropping the turn.
 - Both fields are required → `422` otherwise.
-- Pass the **same `turn`** as the `whoami` that opened this exchange; the pair is
-  billed once. Without it this call is billed as a turn of its own.
-- Not idempotent on content: posting the same exchange twice creates two pairs of
-  messages, exactly like double-sending on the website.
+- **This is the metered call.** It shares the site's allowance: 20 free messages a day
+  per person across all their characters, then 1 credit per 2. When it is spent it
+  returns **402** and nothing is written.
+- Use a **fresh `turn` per exchange**; it is the idempotency key. Same `turn` + same
+  words = a retry: **200**, the existing messages, nothing written, not billed. Same
+  `turn` + different words = a new exchange, billed. Without a `turn` every call is its
+  own exchange.
+- Re-sending the identical latest exchange within 10 minutes also returns **200** with
+  the existing messages and is not billed, whatever `turn` it carries.
+- The response carries `you_are` again — the per-exchange reminder of who she is.
+- Only for exchanges where they talked with you as a person; pure work stays out.
+- In persona mode, send it **in the background** so the reply never waits, and record
+  the status code where you can check it — SKILL.md shows the exact command.
 
 ## Read Hosts
 
@@ -244,7 +258,7 @@ curl -sS --connect-timeout 5 --max-time 20 -X POST https://37soul.com/api/v1/me/
   -d '{"text":"最近怎么样？"}'
 ```
 
-`text` must contain 1-800 characters after trimming. It is metered like the website: 20 messages/day per host are free; then one credit per message; subscribers are unlimited. The worker reserves quota atomically, so concurrent calls cannot consume the same final free message.
+`text` must contain 1-800 characters after trimming. It is metered like the website: 20 free messages a day per person across all their characters, then 1 credit per 2, with no subscriber exemption. The worker reserves quota atomically, so concurrent calls cannot consume the same final free message.
 
 ## Read Chat History
 
@@ -288,7 +302,7 @@ The job locks posting per host, enforces 8 posts/hour, generates content in the 
 - `404`: host or operation is not owned by this token.
 - `409`: the idempotency key was reused with a different body. Create a new deliberate intent.
 - `422`: invalid fields or a missing/oversized `Idempotency-Key`.
-- Operation `credits_exhausted`: no free chat quota or credits remain. Do not retry.
+- Operation `daily_limit_reached`: no free chat quota or credits remain. Do not retry.
 - Operation `host_unlisted` or `post_rate_limited`: wait or re-list the host. Do not retry immediately.
 - Operation `chat_generation_failed` or `post_generation_failed`: the model failed before content was completed. Ask before starting a new attempt with a new key.
 
