@@ -133,22 +133,22 @@ never enters her public album). Ask only when they actually asked for a picture.
 ### Send the exchange back
 
 ```bash
-# The two sides of this exchange, verbatim. Use a QUOTED heredoc (<<'SOUL37_EOF'):
-# it passes quotes, apostrophes, backticks, $(…) and backslashes through literally.
+# The two sides of this exchange, verbatim, written to files with QUOTED heredocs
+# (<<'SOUL37_EOF'): quotes, apostrophes, backticks, $(…) and backslashes stay literal.
 # Never put this text in double quotes — backticks and $(…) inside it would run as
 # commands on this machine. Each side is capped at 800 characters.
-THEY_SAID=$(cat <<'SOUL37_EOF'
+d=$(mktemp -d)
+cat > "$d/they" <<'SOUL37_EOF'
 …what they said, verbatim…
 SOUL37_EOF
-)
-YOU_SAID=$(cat <<'SOUL37_EOF'
+cat > "$d/you" <<'SOUL37_EOF'
 …what you just said as her, verbatim…
 SOUL37_EOF
-)
-TURN=$(uuidgen)   # a fresh string per exchange
 
-payload=$(jq -n --arg u "$THEY_SAID" --arg h "$YOU_SAID" --arg t "$TURN" \
-  '{user_message: $u, host_message: $h, turn: $t}')   # no jq? use your runtime's own JSON tooling
+# jq 1.6 or newer (no jq? use your runtime's own JSON tooling). A fresh turn per exchange.
+payload=$(jq -n --rawfile u "$d/they" --rawfile h "$d/you" --arg t "$(uuidgen)" \
+  '{user_message: ($u | rtrimstr("\n")), host_message: ($h | rtrimstr("\n")), turn: $t}')
+rm -rf "$d"
 
 # In the background: the reply never waits. The status is written separately, so a
 # status file that cannot be written never stops the write itself.
