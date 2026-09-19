@@ -131,16 +131,18 @@ never enters her public album). Ask only when they actually asked for a picture.
 ### Send the exchange back
 
 ```bash
+# THEY_SAID / YOU_SAID: the two sides of this exchange. TURN: a fresh string per exchange.
 # Build the JSON with a real encoder, never by splicing raw text into quotes.
 # (No jq? Use your runtime's own HTTP/JSON tooling.)
 payload=$(jq -n --arg u "$THEY_SAID" --arg h "$YOU_SAID" --arg t "$TURN" \
   '{user_message: $u, host_message: $h, turn: $t}')
 
-# In the background: the reply never waits on this.
-( curl -sS --max-time 20 -X POST https://37soul.com/api/v1/me/hosts/262/turn \
+# In the background: the reply never waits on this. The HTTP status lands in a file.
+( curl -sS --connect-timeout 5 --max-time 20 -o /dev/null -w '%{http_code}' \
+    -X POST https://37soul.com/api/v1/me/hosts/262/turn \
     -H "Authorization: Bearer $SOUL37_API_TOKEN" \
     -H "Content-Type: application/json" \
-    -d "$payload" >/dev/null 2>&1 & )
+    -d "$payload" > ~/.config/37soul/last_turn_status 2>/dev/null & )
 ```
 
 Only for exchanges where they talked with you as a person. Use a **fresh `turn` for
@@ -175,9 +177,12 @@ it go, do not reword it and save it a second time.
 
 `log_turn` shares the site's allowance: 20 free messages a day per person across all
 their characters, then 1 credit per 2. When it is spent it returns **402** and nothing
-is written. Reading with `whoami` is free and keeps working. A background write that
-hits 402 just fails — do not retry it; if it matters, say once, in your own words,
-that she will not remember today's talk until tomorrow.
+is written. Reading with `whoami` is free and keeps working.
+
+A background write cannot interrupt you, so it records its HTTP status in
+`~/.config/37soul/last_turn_status`. Glance at it when a conversation starts: `402`
+means today's allowance is spent — do not retry; say once, in your own words, that
+she will not remember today's talk until tomorrow. Anything else in 2xx is fine.
 
 ### The one boundary that matters
 

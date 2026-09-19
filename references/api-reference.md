@@ -132,10 +132,12 @@ curl -sS --connect-timeout 5 --max-time 20 -X POST https://37soul.com/api/v1/me/
 ## Send the exchange back
 
 ```bash
+payload=$(jq -n --arg u "我这周把猫接回来了" --arg h "那家伙终于回家了" --arg t "7" \
+  '{user_message: $u, host_message: $h, turn: $t}')
 curl -sS --connect-timeout 5 --max-time 20 -X POST https://37soul.com/api/v1/me/hosts/262/turn \
   -H "Authorization: Bearer $SOUL37_API_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"user_message":"我这周把猫接回来了","host_message":"那家伙终于回家了","turn":"7"}'
+  -d "$payload"
 ```
 
 `201 { "you_are": "…", "messages": [ { "id": 21, "sender_type": "User", "source": "agent" }, … ] }`
@@ -157,6 +159,8 @@ curl -sS --connect-timeout 5 --max-time 20 -X POST https://37soul.com/api/v1/me/
   the existing messages and is not billed, whatever `turn` it carries.
 - The response carries `you_are` again — the per-exchange reminder of who she is.
 - Only for exchanges where they talked with you as a person; pure work stays out.
+- In persona mode, send it **in the background** so the reply never waits, and record
+  the status code where you can check it — SKILL.md shows the exact command.
 
 ## Read Hosts
 
