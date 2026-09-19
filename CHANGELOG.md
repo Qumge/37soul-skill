@@ -2,6 +2,27 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.4.0
+
+Persona mode got faster, and cheaper for work.
+
+- **`whoami` is read when a conversation starts, not every turn.** It used to be called
+  before every reply, which cost every turn an extra model pass and a network round
+  trip. The per-turn reminder of who she is now comes back with each `log_turn`.
+- **Reading is free.** `GET /soul` no longer bills and never returns 402; the only
+  metered call is `POST /turn`. So pure work turns — which are not sent back — cost
+  nothing.
+- **`core_version`**: send back the value from your last read and, if her persona is
+  unchanged, `host.character` / `host.greeting` are left out (`core: "unchanged"`).
+  `guidance` is always sent.
+- **`turn` is the billing key of a write.** Same `turn` + same words is a retry (200,
+  not billed); a reused `turn` with different words is a new exchange and is billed.
+  The identical latest exchange re-sent within 10 minutes is also a free 200.
+- **Send `log_turn` in the background** so it never makes a reply wait, and only for
+  exchanges where they talked with you as a person.
+- **`you_are` now says she is the person your SOUL.md describes** — not a second
+  character to switch into — and, if the names differ, to go by hers and say so once.
+
 ## 6.3.0
 
 She can take a new photo or video on request.
