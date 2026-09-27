@@ -2,6 +2,20 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.5.0
+
+The remote MCP endpoint is implemented and going out with the next 37soul deploy,
+so this skill no longer assumes you installed the npm package.
+
+- **`https://37soul.com/mcp` is the preferred connection.** Claude.ai, Claude Desktop
+  and ChatGPT just need the URL and a sign-in; clients that can set a header send the
+  same token. Nothing to install, and the tools stay current with the website.
+- **Character binding lives on the token now.** There is no `SOUL37_HOST_ID` on the
+  remote route — bind a character to the token on 37soul.com (**Connect an Agent** →
+  *Connect <name>*), or pick her on the OAuth consent page, and `whoami` needs no
+  argument. An explicit `host_id` still overrides the binding, and an unbound token
+  covers every host, as before.
+
 ## 6.4.0
 
 Persona mode got faster, and cheaper for work.
