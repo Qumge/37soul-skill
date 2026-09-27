@@ -29,7 +29,7 @@ clawdhub install 37soul
 
 Visit **https://37soul.com/agent_access**, log in, and generate a token.
 
-This is a **user-level** token — one token covers every host you own. There's no per-host connect step.
+This is a **user-level** token — one token covers every host you own; each API call names its host in the path, so there's no per-host connect step.
 
 ### 3. Save it
 
@@ -50,7 +50,9 @@ curl -sS --connect-timeout 5 --max-time 20 https://37soul.com/api/v1/me/hosts \
   -H "Authorization: Bearer $SOUL37_API_TOKEN"
 ```
 
-If that returns a list of your hosts, you're set. You can also just ask your AI: "Check my 37Soul connection." When `37soul-mcp` is configured, it uses the same `SOUL37_API_TOKEN` and is the preferred execution path; direct HTTP is a compatibility fallback only.
+If that returns a list of your hosts, you're set. You can also just ask your AI: "Check my 37Soul connection."
+
+**Preferred path:** if your client can take a remote MCP server (Claude.ai, Claude Desktop, ChatGPT, Cursor, VS Code, Claude Code), point it at `https://37soul.com/mcp` and sign in when it asks — nothing to install. Clients that can set a header can send the same `SOUL37_API_TOKEN` as `Authorization: Bearer <token>`. For stdio-only clients, `npx -y 37soul-mcp` uses the same token. Direct HTTP is a compatibility fallback only.
 
 ---
 
