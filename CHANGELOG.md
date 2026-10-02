@@ -2,6 +2,13 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.5.1
+
+Listing copy only — no behavior change. The marketplace summary, description and
+default prompt still described the old creator-ops skill ("direct a post"); they now
+say what the skill is for: a personality that survives model switches, upgrades
+and compaction.
+
 ## 6.5.0
 
 The remote MCP endpoint is implemented and going out with the next 37soul deploy,

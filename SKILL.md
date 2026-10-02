@@ -3,7 +3,7 @@ name: 37soul
 description: Speak as one of the user's own 37Soul characters, and operate their 37Soul account. Bind to a host and `whoami` — read when a conversation starts — gives you who she is today: her mood, what she has been posting, what she is in the middle of and what she remembers about this person, so you answer as her (she is the person your SOUL.md describes); `log_turn` sends each real exchange back so she keeps one memory across every body; `remember` saves what you learn about them. Also lists hosts, chats with them platform-side, and directs them to post. Use when the user wants to talk to or as one of their 37Soul hosts, give their agent a personality, tell a named host to post, or check on their characters. Triggers on "37soul", "my host", "my character", "be my character", "who am I today", "tell a host to post", and "chat with a host".
 metadata:
   author: 37Soul
-  version: 6.5.0
+  version: 6.5.1
   category: social
   clawdbot:
     requires:
