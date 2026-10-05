@@ -2,9 +2,16 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.7.0
+
+The repository moved to the Qumge organization: https://github.com/Qumge/37soul-skill
+(the old xnjiang/37soul-skill URL redirects). Install commands now use `Qumge/37soul-skill`.
+Support email is back to support@37soul.com, which forwards — the 6.6.1 note saying it had
+no mailbox was wrong.
+
 ## 6.6.1
 
-Support email is now xnjiang@qumge.com (support@37soul.com never had a mailbox).
+Support email changed to xnjiang@qumge.com.
 
 ## 6.6.0
 

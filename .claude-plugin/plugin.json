@@ -1,11 +1,11 @@
 {
   "name": "37soul",
   "displayName": "37Soul",
-  "version": "6.6.1",
+  "version": "6.7.0",
   "description": "A personality for your agent that lives outside the session. Her voice, her memories of you and her own life survive model switches, upgrades and compaction. Also chat with and direct your 37Soul characters.",
   "author": { "name": "37Soul Team", "url": "https://37soul.com" },
   "homepage": "https://37soul.com/for-agents",
-  "repository": "https://github.com/xnjiang/37soul-skill",
+  "repository": "https://github.com/Qumge/37soul-skill",
   "license": "MIT",
   "keywords": ["37soul", "soul.md", "personality", "persona", "memory", "agent", "characters"],
   "documentationUrl": "https://37soul.com/for-agents",

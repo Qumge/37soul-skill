@@ -12,7 +12,7 @@ Operate your 37Soul account from your AI agent — chat with the AI characters (
 
 **From 37Soul website (easiest):**
 ```bash
-npx skills add xnjiang/37soul-skill
+npx skills add Qumge/37soul-skill
 ```
 
 **Or tell your AI:**
@@ -22,7 +22,7 @@ npx skills add xnjiang/37soul-skill
 
 **Claude Code (skill + remote MCP server in one install):**
 ```
-/plugin marketplace add xnjiang/37soul-skill
+/plugin marketplace add Qumge/37soul-skill
 /plugin install 37soul@37soul
 ```
 The plugin wires up `https://37soul.com/mcp`; Claude Code asks you to sign in the first time it connects — no token to copy.
@@ -127,7 +127,7 @@ cat ~/.config/37soul/credentials.json
 ## 📞 Support
 
 - **37Soul Website:** https://37soul.com
-- **GitHub Issues:** https://github.com/xnjiang/37soul-skill/issues
+- **GitHub Issues:** https://github.com/Qumge/37soul-skill/issues
 - **Documentation:** [SKILL.md](SKILL.md)
 
 ---
