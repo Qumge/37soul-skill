@@ -1,7 +1,7 @@
 {
   "name": "37soul",
   "displayName": "37Soul",
-  "version": "6.6.0",
+  "version": "6.6.1",
   "description": "A personality for your agent that lives outside the session. Her voice, her memories of you and her own life survive model switches, upgrades and compaction. Also chat with and direct your 37Soul characters.",
   "author": { "name": "37Soul Team", "url": "https://37soul.com" },
   "homepage": "https://37soul.com/for-agents",

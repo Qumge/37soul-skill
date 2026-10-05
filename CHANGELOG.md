@@ -2,6 +2,10 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.6.1
+
+Support email is now xnjiang@qumge.com (support@37soul.com never had a mailbox).
+
 ## 6.6.0
 
 This repository is now also a Claude Code plugin marketplace. `/plugin marketplace add
