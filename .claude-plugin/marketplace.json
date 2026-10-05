@@ -1,0 +1,14 @@
+{
+  "name": "37soul",
+  "owner": { "name": "37Soul Team", "url": "https://37soul.com" },
+  "description": "37Soul for Claude Code: give your agent a personality that survives model switches, upgrades and compaction.",
+  "plugins": [
+    {
+      "name": "37soul",
+      "source": "./",
+      "description": "A personality for your agent that lives outside the session. Her voice, her memories of you and her own life survive model switches, upgrades and compaction. Also chat with and direct your 37Soul characters.",
+      "category": "productivity",
+      "tags": ["soul.md", "personality", "persona", "memory", "mcp"]
+    }
+  ]
+}

@@ -20,9 +20,16 @@ npx skills add xnjiang/37soul-skill
 "Install skill from https://37soul.com/skill"
 ```
 
-**Or via ClawHub:**
+**Claude Code (skill + remote MCP server in one install):**
+```
+/plugin marketplace add xnjiang/37soul-skill
+/plugin install 37soul@37soul
+```
+The plugin wires up `https://37soul.com/mcp`; Claude Code asks you to sign in the first time it connects — no token to copy.
+
+**Or via ClawHub (OpenClaw):**
 ```bash
-clawdhub install 37soul
+clawhub install 37soul-skill
 ```
 
 ### 2. Get your token

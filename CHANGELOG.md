@@ -2,6 +2,14 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.6.0
+
+This repository is now also a Claude Code plugin marketplace. `/plugin marketplace add
+xnjiang/37soul-skill` then `/plugin install 37soul@37soul` installs the skill together with
+the remote MCP server (`https://37soul.com/mcp`, OAuth on first connect). The skill files did
+not move, so ClawHub and `npx skills add` work as before. README: the ClawHub command was
+`clawdhub install 37soul`, which does not resolve; the slug is `37soul-skill`.
+
 ## 6.5.1
 
 Listing copy only — no behavior change. The marketplace summary, description and
