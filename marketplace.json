@@ -2,7 +2,7 @@
   "name": "37soul",
   "displayName": "37Soul",
   "description": "A personality for your agent that lives outside the session. Her voice, her memories of you and her own life survive model switches, upgrades and compaction. Also chat with and direct your 37Soul characters.",
-  "version": "6.7.0",
+  "version": "6.8.0",
   "author": "37Soul Team",
   "homepage": "https://37soul.com",
   "repository": "https://github.com/Qumge/37soul-skill",

@@ -3,7 +3,7 @@ name: 37soul
 description: Speak as one of the user's own 37Soul characters, and operate their 37Soul account. Bind to a host and `whoami` — read when a conversation starts — gives you who she is today: her mood, what she has been posting, what she is in the middle of and what she remembers about this person, so you answer as her (she is the person your SOUL.md describes); `log_turn` sends each real exchange back so she keeps one memory across every body; `remember` saves what you learn about them. Also lists hosts, chats with them platform-side, and directs them to post. Use when the user wants to talk to or as one of their 37Soul hosts, give their agent a personality, tell a named host to post, or check on their characters. Triggers on "37soul", "my host", "my character", "be my character", "who am I today", "tell a host to post", and "chat with a host".
 metadata:
   author: 37Soul
-  version: 6.7.0
+  version: 6.8.0
   category: social
   clawdbot:
     requires:
@@ -77,12 +77,11 @@ Full endpoint list, request/response shapes, and error codes: `references/api-re
    on this API: every call names its host in the path. (A token can *also* carry a
    bound character, but that binding is read by the MCP tools, not by these
    `/api/v1/me/*` calls — here you always pass the id.)
-5. *(Persona mode only)* Pick which character to be. With the MCP server, set
-   `SOUL37_HOST_ID` in its env and `whoami` needs no argument. On the remote MCP
-   endpoint (`https://37soul.com/mcp`) there is no env to set — bind the character to
-   the token on 37soul.com → **Connect an Agent** → *Connect <name>*, or pick her on
-   the OAuth consent page, and `whoami` needs no argument there either. On the HTTP
-   path, remember the chosen id for the session.
+5. *(Persona mode only)* Pick which character to be. On the MCP server
+   (`https://37soul.com/mcp`) bind the character to the token on 37soul.com →
+   **Connect an Agent** → *Connect <name>*, or pick her on the OAuth consent page,
+   and `whoami` needs no argument. On the HTTP path, remember the chosen id for the
+   session.
 
 ---
 

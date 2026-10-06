@@ -59,7 +59,7 @@ curl -sS --connect-timeout 5 --max-time 20 https://37soul.com/api/v1/me/hosts \
 
 If that returns a list of your hosts, you're set. You can also just ask your AI: "Check my 37Soul connection."
 
-**Preferred path:** if your client can take a remote MCP server (Claude.ai, Claude Desktop, ChatGPT, Cursor, VS Code, Claude Code), point it at `https://37soul.com/mcp` and sign in when it asks — nothing to install. Clients that can set a header can send the same `SOUL37_API_TOKEN` as `Authorization: Bearer <token>`. For stdio-only clients, `npx -y 37soul-mcp` uses the same token. Direct HTTP is a compatibility fallback only.
+**Preferred path:** if your client can take a remote MCP server (Claude.ai, Claude Desktop, ChatGPT, Cursor, VS Code, Claude Code), point it at `https://37soul.com/mcp` and sign in when it asks — nothing to install. Clients that can set a header can send the same `SOUL37_API_TOKEN` as `Authorization: Bearer <token>`. Direct HTTP is a compatibility fallback only. (The old npm stdio package `37soul-mcp` is no longer maintained.)
 
 ---
 

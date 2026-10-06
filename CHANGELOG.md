@@ -2,6 +2,12 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.8.0
+
+The npm stdio package `37soul-mcp` is no longer published. The only MCP path is the
+hosted server `https://37soul.com/mcp` (OAuth, or the API token as a Bearer header);
+the character binding lives on the token, so there is no `SOUL37_HOST_ID` to set.
+
 ## 6.7.0
 
 The repository moved to the Qumge organization: https://github.com/Qumge/37soul-skill
