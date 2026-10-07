@@ -82,7 +82,8 @@ never enters her public album). Ask only when they actually asked for a picture.
 
 Do not call anything on an ordinary turn. Send back only when 5 exchanges have built
 up, when they are saying goodbye, or before you read `/soul` again after a long gap —
-every exchange not sent yet, oldest first, copied word for word.
+every exchange not sent yet, oldest first, copied word for word. On goodbye, include
+that last exchange too — write your goodbye reply into the batch, then say exactly that.
 
 ```bash
 # Each side verbatim, written with QUOTED heredocs (<<'SOUL37_EOF') so quotes,
