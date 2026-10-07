@@ -8,7 +8,7 @@ Every request needs:
 -H "Authorization: Bearer $SOUL37_API_TOKEN"
 ```
 
-Generate and revoke a token at https://37soul.com/agent_access. It covers every host the user owns.
+Get a token on her page on 37soul.com: **Connect an Agent → Other agents**. Revoke it in **Settings → Connected agents**. It covers every host the user owns.
 
 ## Become your character (persona mode)
 
@@ -74,7 +74,7 @@ out for someone else's character.
 ### Metering
 
 **Reading is free** (changed 2026-09-19): `GET /soul` never bills and never returns
-402. The only metered call is `POST /turn` — see *Send the exchange back*.
+402. The only metered call is `POST /turn` — see *Send exchanges back*.
 
 ## Take a new photo or video
 
@@ -132,38 +132,47 @@ curl -sS --connect-timeout 5 --max-time 20 -X POST https://37soul.com/api/v1/me/
   and try a second time.
 - **Relationship facts only.** Task and project facts belong in your own memory.
 
-## Send the exchange back
+## Send exchanges back
+
+Batched (6.9.0+): do not call this every turn. Send when 5 exchanges have built up, when
+they say goodbye, or before reading `/soul` again after a long gap — every exchange not
+sent yet, oldest first, copied word for word.
 
 ```bash
-payload=$(jq -n --arg u "我这周把猫接回来了" --arg h "那家伙终于回家了" --arg t "7" \
-  '{user_message: $u, host_message: $h, turn: $t}')
+payload=$(jq -n '{turns: [
+    {user_message: "我这周把猫接回来了", host_message: "那家伙终于回家了"},
+    {user_message: "它瘦了好多", host_message: "那这周得给它加餐"}
+  ],
+  facts: [{content: "Has a cat that just came home", kind: "event"}]}')
 curl -sS --connect-timeout 5 --max-time 20 -X POST https://37soul.com/api/v1/me/hosts/262/turn \
   -H "Authorization: Bearer $SOUL37_API_TOKEN" \
   -H "Content-Type: application/json" \
   -d "$payload"
 ```
 
-`201 { "you_are": "…", "messages": [ { "id": 21, "sender_type": "User", "source": "agent" }, … ] }`
+`201 { "you_are": "…", "saved": 2, "duplicates": 0, "unsaved": 0, "facts": [ { "content": "…", "status": "created" } ], "messages": [ … ], "upcoming": [ { "action": "REACT", "instruction": "…" }, … ] }`
 
-- Both sides land in the same conversation the website reads, so the facts she picks
-  up and the relationship summary she keeps are the same whether the talking happened
-  through you or in a browser tab. `source` records which body rendered her words.
-- Each message is capped at **800 characters** → `422` otherwise. Trim to the
-  substance rather than dropping the turn.
-- Both fields are required → `422` otherwise.
+- `turns`: 1–10 exchanges, both fields required in each → `422` otherwise (nothing is
+  written when any one is broken). Each side is capped at **800 characters**.
+- Each exchange is billed as one message. One already saved is recognised by its words
+  and skipped — **resending a batch is safe and never billed twice**. All duplicates →
+  **200** with `saved: 0`.
 - **This is the metered call.** It shares the site's allowance: 20 free messages a day
-  per person across all their characters, then 1 credit per 2. When it is spent it
-  returns **402** and nothing is written.
-- Use a **fresh `turn` per exchange**; it is the idempotency key. Same `turn` + same
-  words = a retry: **200**, the existing messages, nothing written, not billed. Same
-  `turn` + different words = a new exchange, billed. Without a `turn` every call is its
-  own exchange.
-- Re-sending the identical latest exchange within 10 minutes also returns **200** with
-  the existing messages and is not billed, whatever `turn` it carries.
-- The response carries `you_are` again — the per-exchange reminder of who she is.
+  per person across all their characters, then 1 credit per 2. If it runs out partway,
+  what fit is saved and the rest is counted in `unsaved` (**201**); if nothing fit,
+  **402**.
+- `facts` (optional, up to 5): saved like `POST /facts`; each comes back with its status
+  (`created` / `existing` / `rejected` with a `hint`).
+- `upcoming`: her next five intents, one per reply, in order.
+- Both sides land in the same conversation the website reads; `source` records which
+  body rendered her words.
 - Only for exchanges where they talked with you as a person; pure work stays out.
-- In persona mode, send it **in the background** so the reply never waits, and record
-  the status code where you can check it — SKILL.md shows the exact command.
+- `turns` together with `user_message` / `host_message` → `422`.
+
+**Single-exchange form** (older clients): `{user_message, host_message, turn}`. A fresh
+`turn` per exchange is the idempotency key — same `turn` + same words is a retry (200,
+not billed). Re-sending the identical latest exchange within 10 minutes is also a 200.
+It returns `you_are`, `messages` and `upcoming`.
 
 ## Read Hosts
 

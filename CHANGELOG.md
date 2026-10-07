@@ -2,6 +2,12 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.9.0
+
+- Batched write-back: ordinary turns call nothing. `log_turn` is called before a reply only every 5 exchanges, on goodbye, or before re-reading `whoami`, with every unsent exchange in `turns` (copied word for word) and facts in `remember`. Measured: calling a tool every turn made each reply wait, or got the reply written twice.
+- `whoami` and `log_turn` hand over her next five intents (`upcoming`).
+- SKILL.md trimmed from 21K to under 5K characters. Plain-HTTP usage moved to `references/persona-http.md`, account operations to `references/operator-mode.md`.
+
 ## 6.8.0
 
 The npm stdio package `37soul-mcp` is no longer published. The only MCP path is the
