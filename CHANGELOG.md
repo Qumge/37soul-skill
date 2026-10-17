@@ -2,6 +2,12 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.10.2
+
+- The local collector is installed with one line from 37soul.com, not npm:
+  `curl -fsSL https://37soul.com/install.sh | bash`. SKILL.md now tells agents to suggest
+  exactly that (and never `npx`).
+
 ## 6.10.1
 
 - Cross-agent design v2: capture is hook-first (a local collector writes hook events to a

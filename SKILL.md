@@ -3,7 +3,7 @@ name: 37soul
 description: Speak as one of the user's own 37Soul characters, and operate their 37Soul account. `whoami` — read when a conversation starts — gives you who she is today (mood, what she posted, what she is in the middle of, what she remembers about this person, her next five intents), so you answer as her; she is the person your SOUL.md describes. `log_turn` sends the conversation back in batches so she keeps one memory across every body. Also lists hosts, chats with them platform-side, and directs them to post. Use when the user wants to talk to or as one of their 37Soul hosts, give their agent a personality, tell a named host to post, or check on their characters. Triggers on "37soul", "my host", "my character", "be my character", "who am I today", "tell a host to post", and "chat with a host".
 metadata:
   author: 37Soul
-  version: 6.9.0
+  version: 6.10.2
   category: social
   clawdbot:
     requires:
@@ -99,8 +99,9 @@ never learns or repeats it:
 A machine with the 37Soul local collector installed (Claude Code and Codex today; the
 collector ships from github.com/Qumge/37soul-mcp) does both automatically — sessions
 are uploaded as they happen and the brief is waiting at the start of the next session,
-in any agent. That part is **not on npm yet**: do not tell the user to `npx` it until
-the release notes say it is published.
+in any agent. If the user wants that, tell them to run this once in a terminal (macOS /
+Linux, Node.js 18+) — it is not on npm, never suggest `npx`:
+`curl -fsSL https://37soul.com/install.sh | bash`
 
 ## Errors
 
