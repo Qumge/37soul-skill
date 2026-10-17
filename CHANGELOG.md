@@ -2,6 +2,13 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.10.1
+
+- Cross-agent design v2: capture is hook-first (a local collector writes hook events to a
+  spool; the transcript parsers are fallback), and `resume` claims the handoff — when the
+  brief says another agent is working on the branch, the skill asks the user instead of
+  repeating the work. `checkpoint` unchanged.
+
 ## 6.10.0
 
 - Cross-agent work continuity: `resume` reads where a project stands and `checkpoint`
