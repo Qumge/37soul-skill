@@ -2,6 +2,20 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.10.0
+
+- Cross-agent work continuity: `resume` reads where a project stands and `checkpoint`
+  writes it back as a fallback; the plain-HTTP equivalent is
+  `GET /api/v1/me/brief` (documented in `references/api-reference.md` and
+  `references/persona-http.md`). Work text never enters her posts, replies or memory —
+  it is notes for the next agent, not instructions.
+- Captured mode: when a local collector is running for this body, `whoami` / `log_turn`
+  say everything is already kept — then never call `log_turn` or `remember` in that
+  session. The collector ships from github.com/Qumge/37soul-mcp and is **not on npm
+  yet**; the skill says so honestly and does not advertise an install command.
+- `37soul-mcp` bumped to 0.11.0 (SERVER_VERSION parity): resume/checkpoint added on both
+  the hosted `/mcp` and the local stdio package.
+
 ## 6.9.0
 
 - Batched write-back: ordinary turns call nothing. `log_turn` is called before a reply only every 5 exchanges, on goodbye, or before re-reading `whoami`, with every unsent exchange in `turns` (copied word for word) and facts in `remember`. Measured: calling a tool every turn made each reply wait, or got the reply written twice.
