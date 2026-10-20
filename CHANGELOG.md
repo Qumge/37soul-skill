@@ -2,7 +2,7 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
-## 6.11.0
+## 6.11.0 - 2026-10-20
 
 - Persistent soul replaces the old transcript / cloud-continuity model. Raw
   conversation, commands, files and tool output stay on the machine; the 37Soul local
