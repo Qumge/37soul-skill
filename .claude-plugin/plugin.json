@@ -1,8 +1,8 @@
 {
   "name": "37soul",
   "displayName": "37Soul",
-  "version": "6.10.2",
-  "description": "A personality for your agent that lives outside the session. Her voice, her memories of you and her own life survive model switches, upgrades and compaction. Also chat with and direct your 37Soul characters. Work continuity travels with the same skill: resume/checkpoint carry a project's state between agents, and the optional local collector makes it automatic.",
+  "version": "6.11.0",
+  "description": "A persistent soul for your agent: her identity, what she has learned about you, and reusable methods survive model switches, upgrades and compaction, and grow locally on your machine — raw conversation stays local and only long-term assets sync to 37Soul. Also chat with and direct your 37Soul characters.",
   "author": {
     "name": "37Soul Team",
     "url": "https://37soul.com"

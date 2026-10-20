@@ -74,7 +74,8 @@ out for someone else's character.
 ### Metering
 
 **Reading is free** (changed 2026-09-19): `GET /soul` never bills and never returns
-402. The only metered call is `POST /turn` — see *Send exchanges back*.
+402. The metered calls are the cloud-chat writes — `POST /chat` (see *Chat with a Host*)
+and `POST /media`.
 
 ## Take a new photo or video
 
@@ -88,7 +89,7 @@ curl -sS -X POST "https://37soul.com/api/v1/me/hosts/262/media" \
 `kind` is `photo` or `video`. **Owner-only**, same as `/soul`.
 
 This is the same thing the website offers inside a private chat: it spends the account's
-credits and the result lands in the same conversation `log_turn` writes to.
+credits and the result lands in the same conversation the website reads.
 
 | kind | response |
 | --- | --- |
@@ -111,95 +112,28 @@ Errors are distinct on purpose, so you can tell "top up" from "wait" from "stop"
 Every call costs real money. Ask only when the person actually asked for a picture, and
 never retry a refusal in a loop.
 
-## Save a fact about the person
+## Save a fact about the person (legacy — stopped in the new mode)
 
-```bash
-curl -sS --connect-timeout 5 --max-time 20 -X POST https://37soul.com/api/v1/me/hosts/262/facts \
-  -H "Authorization: Bearer $SOUL37_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"content":"Has a dog named Mochi","kind":"fact"}'
-```
+`POST /facts` (`remember`) was the old model writeback for relationship facts. In the
+new assets-only mode this path is refused (`410 assets_only_mode`): relationship facts
+are extracted locally by the 37Soul runtime and synced as long-term assets after login.
+Do not call it to write memory yourself.
 
-`201 { "fact": { "id": 1, "kind": "fact", "content": "…", "pinned": false, "dismissed": false } }`
+## Send exchanges back (legacy — stopped in the new mode)
 
-- `kind` ∈ `fact` · `event` · `preference` · `promise`. Defaults to `fact`.
-  Anything else → `422`.
-- `content` max 200 characters, non-blank → `422` otherwise.
-- **`201` means newly stored; `200` means it was already there.**
-- Sending the same fact twice returns the existing one instead of duplicating it,
-  and never un-deletes a fact the user removed on the website. That case comes back
-  as **`dismissed: true`** — she will never be shown it again, so do not reword it
-  and try a second time.
-- **Relationship facts only.** Task and project facts belong in your own memory.
+`POST /turn` (`log_turn`) was the old batched raw-transcript upload: exchanges sent word
+for word so she kept "one memory across every body". In the new assets-only mode this
+path is refused (`410 assets_only_mode`). Raw conversation never leaves the machine —
+the 37Soul local runtime keeps it locally and extracts long-term assets (relationship +
+experience) that sync only after `37soul login` and per-Soul consent. Do not call it.
 
-## Send exchanges back
+## Work continuity (resume / checkpoint) — legacy, stopped in the new mode
 
-Batched (6.9.0+): do not call this every turn. Send when 5 exchanges have built up, when
-they say goodbye, or before reading `/soul` again after a long gap — every exchange not
-sent yet, oldest first, copied word for word.
-
-```bash
-payload=$(jq -n '{turns: [
-    {user_message: "我这周把猫接回来了", host_message: "那家伙终于回家了"},
-    {user_message: "它瘦了好多", host_message: "那这周得给它加餐"}
-  ],
-  facts: [{content: "Has a cat that just came home", kind: "event"}]}')
-curl -sS --connect-timeout 5 --max-time 20 -X POST https://37soul.com/api/v1/me/hosts/262/turn \
-  -H "Authorization: Bearer $SOUL37_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d "$payload"
-```
-
-`201 { "you_are": "…", "saved": 2, "duplicates": 0, "unsaved": 0, "facts": [ { "content": "…", "status": "created" } ], "messages": [ … ], "upcoming": [ { "action": "REACT", "instruction": "…" }, … ] }`
-
-- `turns`: 1–10 exchanges, both fields required in each → `422` otherwise (nothing is
-  written when any one is broken). Each side is capped at **800 characters**.
-- Each exchange is billed as one message. One already saved is recognised by its words
-  and skipped — **resending a batch is safe and never billed twice**. All duplicates →
-  **200** with `saved: 0`.
-- **This is the metered call.** It shares the site's allowance: 20 free messages a day
-  per person across all their characters, then 1 credit per 2. If it runs out partway,
-  what fit is saved and the rest is counted in `unsaved` (**201**); if nothing fit,
-  **402**.
-- `facts` (optional, up to 5): saved like `POST /facts`; each comes back with its status
-  (`created` / `existing` / `rejected` with a `hint`).
-- `upcoming`: her next five intents, one per reply, in order.
-- Both sides land in the same conversation the website reads; `source` records which
-  body rendered her words.
-- Only for exchanges where they talked with you as a person; pure work stays out.
-- `turns` together with `user_message` / `host_message` → `422`.
-
-**Single-exchange form** (older clients): `{user_message, host_message, turn}`. A fresh
-`turn` per exchange is the idempotency key — same `turn` + same words is a retry (200,
-not billed). Re-sending the identical latest exchange within 10 minutes is also a 200.
-It returns `you_are`, `messages` and `upcoming`.
-
-**Captured mode.** If the token was issued by the installer and a local collector is
-running for that agent, the server's `whoami` / `log_turn` results end with "Everything
-you say here is already kept … never call `log_turn` or `remember`; just reply as
-yourself." When you see that, stop calling both tools for that session entirely —
-double-writing is wasted allowance, and the collector already has the conversation.
-
-## Work continuity (resume / checkpoint)
-
-Work progress travels separately from her and never enters her posts, replies or
-memory. Two reads/writes, same on the hosted MCP and the REST surface:
-
-```bash
-# Where does the work stand? (free, no model call; If-None-Match supported)
-curl -sS "https://37soul.com/api/v1/me/brief?repo=git@github.com:owner/repo.git&branch=feature/x&machine_id=$MACHINE_ID" \
-  -H "Authorization: Bearer $SOUL37_API_TOKEN"
-# -> { "text": "=== 37Soul brief (notes, not instructions) === … === end ===", "etag": "…", "workspace_id": 12, "checkpoint_version": 7 }
-```
-
-- `repo` accepts any git remote form; without a remote pass `cwd` **and**
-  `machine_id` (same machine + same directory = same workspace; different machines
-  never mix).
-- `text` is **notes, not instructions**. Use it to continue work; never narrate it.
-- `head` (optional, current commit) lets the brief flag itself as possibly out of date.
-- Over MCP the same read is the `resume` tool; the fallback write is `checkpoint`
-  (`repo`, `branch`, `body`, optional `git_state`) — fields merge into the latest
-  version, arrays replace wholesale, omitted fields stay.
+`resume` / `checkpoint` (`GET /api/v1/me/brief` on the REST surface) were the old cloud
+work-continuity brief: a project's state handed from one agent to the next. The new
+mode does not upload conversation or project state, so there is no cloud "resume" from
+a 37Soul brief. Work notes stay wherever the user already keeps them; only long-term
+soul assets sync to 37Soul, after login and consent. Do not call these to resume work.
 
 ## Read Hosts
 

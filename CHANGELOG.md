@@ -2,6 +2,28 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.11.0
+
+- Persistent soul replaces the old transcript / cloud-continuity model. Raw
+  conversation, commands, files and tool output stay on the machine; the 37Soul local
+  runtime extracts long-term soul assets (identity, relationship, experience) and syncs
+  only those to 37Soul after `37soul login` and per-device/Soul consent. The old
+  `log_turn` / `remember` transcript-fact writebacks and `resume` / `checkpoint` cloud
+  work continuity are legacy and stopped in the new assets-only mode
+  (`410 assets_only_mode`).
+- Four runtimes documented — Claude Code, Codex, OpenCode, Hermes — all **unverified**:
+  none has passed a live structured-extraction probe yet. Codex requires hook trust;
+  OpenCode plugin generation is declared but unverified; Hermes gateway-only
+  configurations are not CLI support (0.21.0 observed, not verified); Claude Code is
+  the reference but its CLI-version extraction is unverified. No supported-versions
+  table is printed.
+- Anonymous local use works with no login; `37soul login` is only for sync. Consent is
+  per device/Soul and `categories` is a full replacement; revocation keeps local
+  unsynced assets. Failures stay local and pending (two-attempt budget per source
+  range); review/delete happens through the owner's interactive CLI; uninstall keeps
+  every user asset; `37soul status` / `37soul doctor` report honest states and never
+  substitute a manual-copy instruction.
+
 ## 6.10.2
 
 - The local collector is installed with one line from 37soul.com, not npm:
