@@ -2,6 +2,15 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.11.2 - 2026-10-21
+
+- Clarify that an unauthorized local Soul never blocks sync for an authorized Soul;
+  explicit `37soul soul authorize` is required before its Binding/Consent is sent.
+- Local identity edits update the injected/exported identity and its revision; a
+  revoked cloud identity still falls back to the latest local original.
+- Offline bind/detach ordering preserves the user's latest detach intent across
+  interrupted sync ACKs.
+
 ## 6.11.1 - 2026-10-21
 
 - Clarify that local creation is not cloud authorization. The explicit entry is
