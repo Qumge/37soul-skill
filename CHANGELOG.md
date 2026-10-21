@@ -2,6 +2,14 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.11.1 - 2026-10-21
+
+- Clarify that local creation is not cloud authorization. The explicit entry is
+  `37soul soul authorize <uid> --categories identity,relationship,experience`.
+- Login credentials are scoped to profile/owner/cloud device/runtime and never reused
+  across local profiles. Revocation drops downloaded cloud cache and revoked
+  credentials while keeping local originals and unsynced assets.
+
 ## 6.11.0 - 2026-10-20
 
 - Persistent soul replaces the old transcript / cloud-continuity model. Raw

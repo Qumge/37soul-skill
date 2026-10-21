@@ -84,9 +84,12 @@ probes pass.
 ## 🌱 Local growth, login and failures
 
 - **Anonymous local use** works with no login: create, select and grow a soul locally.
-- **`37soul login`** (device code) is only needed to sync assets. Consent is per
-  device/Soul, and `categories` is a full replacement (identity / relationship /
-  experience).
+- **`37soul login`** (device code) is only needed to sync assets. Local creation is
+  not authorization: run `37soul soul authorize <uid> --categories
+  identity,relationship,experience` to explicitly register that Soul and open its
+  Consent. Consent is per device/Soul, and `categories` is a full replacement
+  (identity / relationship / experience). Login credentials are scoped to that exact
+  profile/owner/cloud device/runtime and are never reused for another local profile.
 - **What grows:** identity (you edit it), relationship assets (stable preferences,
   long-term goals, agreed ways of working) and experience assets (reusable methods).
   Extraction is bounded — at most 2 automatic attempts per source range and binding
@@ -95,7 +98,7 @@ probes pass.
   error). Nothing falls back to uploading raw text. You review, correct and delete
   through the interactive CLI on the owner's machine; a model can never change identity
   or call review/delete.
-- **Revocation** stops sync and injection but keeps local unsynced assets.
+- **Revocation** stops sync and injection, drops downloaded cloud cache and the revoked device credentials, and keeps local original/unsynced assets. Identity revocation never reinjects a downloaded private identity.
 - **Uninstall** removes only the runtime's managed files; profiles, raw archives and the
   unsynced queue are kept. `37soul status` / `37soul doctor` report honest states
   (`not installed`, `untrusted`, `not loaded`, `model refused`, `observation-only`,
