@@ -2,6 +2,22 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.12.0 - 2026-10-21
+
+- New local Souls require one complete profile: name, sex (`male`/`female`/`other`),
+  age 16–65 and at least 50 Unicode characters of character text. The Skill collects
+  all four, may draft from the user's description but must get confirmation, and never
+  invents missing facts.
+- `37soul soul create` supports `--sex`, `--age` and optional `--avatar <path>`. The
+  default avatar is stable per Soul UUID; a chosen local image is not uploaded during
+  anonymous use and can be retried with `37soul soul avatar`.
+- Local stay is anonymous; after login and explicit `soul authorize`, the same UUID is
+  registered as a public Host. The role page shows the one submitted profile, while
+  private chats and per-person relationship memory stay isolated.
+- New-account guidance uses the local runtime/device login rather than hand-written
+  token files, and removes legacy write-back instructions. Local sync never grants
+  arbitrary machine execution or cross-user memory.
+
 ## 6.11.3 - 2026-10-21
 
 - Restore an existing website Soul on a new machine: run `37soul login`, choose the Soul

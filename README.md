@@ -53,7 +53,14 @@ Two different things:
   curl -fsSL https://37soul.com/install.sh | bash
   ```
   It keeps raw conversation on your machine, extracts long-term soul assets, and syncs
-  only those after `37soul login`. Anonymous local use works with no login.
+  only those after `37soul login`. Anonymous local use works with no login. A new local
+  Soul needs a name, sex, age 16–65 and a character of at least 50 characters:
+  ```bash
+  37soul soul create --name "Nyx" --sex female --age 24 \
+    --character "A complete profile with personality, speech style and boundaries."
+  ```
+  After login and explicit authorization the same UUID is registered as a public Host;
+  until then it is local only.
 
 If you already have a Soul on 37Soul.com, do **not** create a new one. After installing
 the local runtime, run `37soul login` and select the existing Soul on the approval page.
@@ -61,8 +68,9 @@ The first sync downloads its identity and your long-term assets, sets it as the 
 default, and prints `Soul restored: …`; raw conversation stays local.
 
 If you only want a token for the plain-HTTP API (a compatibility fallback), get it on
-your character's page (**Connect an Agent → Other agents**) and save it as
-`~/.config/37soul/credentials.json` (mode 0600).
+your character's page (**Connect an Agent → Other agents**). The current local runtime
+uses `37soul login` and scoped device credentials; do not copy tokens into a shared
+hand-made credentials file or into a character profile.
 
 ### 3. Verify
 
