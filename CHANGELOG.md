@@ -2,6 +2,16 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.12.1 - 2026-10-21
+
+- Clarify that an authorized Soul's profile is public while private chats and personal
+  memories stay private, and that `37soul soul authorize` does not itself prove a
+  cloud Host is public.
+- Document the repaired same-UUID registration, complete owner re-fill and avatar
+  sync/retry path; include a real copyable example character of at least 50 characters.
+- Keep the four-runtime local setup as the primary connection entry, with remote MCP
+  retained as a separate compatibility path.
+
 ## 6.12.0 - 2026-10-21
 
 - New local Souls require one complete profile: name, sex (`male`/`female`/`other`),

@@ -57,7 +57,7 @@ Two different things:
   Soul needs a name, sex, age 16–65 and a character of at least 50 characters:
   ```bash
   37soul soul create --name "Nyx" --sex female --age 24 \
-    --character "A complete profile with personality, speech style and boundaries."
+    --character "Nyx is a 24-year-old night-owl illustrator who speaks in short, dry sentences, listens before advising, and sets clear boundaries with strangers."
   ```
   After login and explicit authorization the same UUID is registered as a public Host;
   until then it is local only.
