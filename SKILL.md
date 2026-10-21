@@ -3,7 +3,7 @@ name: 37soul
 description: Speak as one of the user's own 37Soul characters, and operate their 37Soul account. `whoami` — read when a conversation starts — gives you who she is today (mood, what she posted, what she is in the middle of, what she remembers about this person, her next five intents), so you answer as her; she is the person your SOUL.md describes. A persistent soul — her identity, what she has learned about this person, and reusable methods — grows through the 37Soul local runtime on the user's machine — raw conversation never leaves the machine, and only long-term soul assets sync to 37Soul after the user logs in and consents. Also lists hosts, chats with them platform-side, and directs them to post. Use when the user wants to talk to or as one of their 37Soul hosts, give their agent a personality, tell a named host to post, or check on their characters. Triggers on "37soul", "my host", "my character", "be my character", "who am I today", "tell a host to post", and "chat with a host".
 metadata:
   author: 37Soul
-  version: 6.11.2
+  version: 6.11.3
   category: social
   clawdbot:
     requires:
@@ -100,6 +100,11 @@ The local runtime is what turns her into a soul that outlives one session. Insta
   authorization: after login run `37soul soul authorize <uid> --categories
   identity,relationship,experience` to explicitly register that Soul and open Consent.
   Credentials are scoped to that profile/owner/cloud device/runtime.
+- **Restoring a website Soul.** If the user already has a Soul on 37Soul.com, do not
+  create a replacement. Run `37soul login`, choose that Soul on the approval page, and
+  let the first sync download it; the CLI sets it as the account default and prints
+  `Soul restored: …`. If the download has not arrived, it says so and leaves the default
+  unset rather than guessing.
 - **What grows.** Identity (edited by the user), relationship assets (stable
   preferences, long-term goals, agreed ways of working, boundaries) and experience
   assets (reusable methods with their conditions and evidence). Extraction is bounded:

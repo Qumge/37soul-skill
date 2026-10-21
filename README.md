@@ -55,6 +55,11 @@ Two different things:
   It keeps raw conversation on your machine, extracts long-term soul assets, and syncs
   only those after `37soul login`. Anonymous local use works with no login.
 
+If you already have a Soul on 37Soul.com, do **not** create a new one. After installing
+the local runtime, run `37soul login` and select the existing Soul on the approval page.
+The first sync downloads its identity and your long-term assets, sets it as the account
+default, and prints `Soul restored: …`; raw conversation stays local.
+
 If you only want a token for the plain-HTTP API (a compatibility fallback), get it on
 your character's page (**Connect an Agent → Other agents**) and save it as
 `~/.config/37soul/credentials.json` (mode 0600).

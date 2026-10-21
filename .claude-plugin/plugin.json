@@ -1,7 +1,7 @@
 {
   "name": "37soul",
   "displayName": "37Soul",
-  "version": "6.11.2",
+  "version": "6.11.3",
   "description": "A persistent soul for your agent: her identity, what she has learned about you, and reusable methods survive model switches, upgrades and compaction, and grow locally on your machine — raw conversation stays local and only long-term assets sync to 37Soul. Also chat with and direct your 37Soul characters.",
   "author": {
     "name": "37Soul Team",

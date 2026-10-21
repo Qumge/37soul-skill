@@ -2,6 +2,18 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.11.3 - 2026-10-21
+
+- Restore an existing website Soul on a new machine: run `37soul login`, choose the Soul
+  on the approval page, and the first sync downloads its identity and your long-term
+  assets and sets it as the account default. No duplicate local Soul is created; an
+  unfinished download leaves the default unset and reports it.
+- Repeat install preserves scoped credentials, the local profile, Soul UUIDs and assets;
+  sync credentials are no longer dropped by reinstalling.
+- Install/status/doctor copy now describes local-first use and distinguishes
+  `login required` from a sync failure. `37soul uninstall` is documented as removing
+  managed files only, never profiles or raw archives.
+
 ## 6.11.2 - 2026-10-21
 
 - Clarify that an unauthorized local Soul never blocks sync for an authorized Soul;
