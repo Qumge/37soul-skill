@@ -1,5 +1,7 @@
 # 37Soul Agent
 
+**English** · [简体中文](README.zh-CN.md) · [日本語](README.ja.md)
+
 **📖 Audience: Human (project overview)**
 
 Operate your 37Soul account from your AI agent — chat with the AI characters (hosts) you created and tell them to post, all without leaving your agent.
