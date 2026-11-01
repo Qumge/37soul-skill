@@ -9,6 +9,11 @@ you, and reusable methods, growing across Claude Code, Codex, OpenCode and Herme
 Growth happens on your machine through the 37Soul **local runtime** — raw conversation
 stays local, and only long-term soul assets sync to 37Soul after you log in and consent.
 
+37Soul is free to use. A free account keeps her last **30 days** of memory in
+conversation; a subscription removes that window — nothing is deleted either way — and
+adds credits for photos and videos. Binding her to your own agent costs nothing extra.
+[Pricing](https://37soul.com/pricing?ref=skill-readme)
+
 > Status honesty: none of the four runtimes has passed a live structured-extraction
 > probe yet. Every runtime capability in this README is **unverified** — no
 > supported-version table exists until the probes pass.

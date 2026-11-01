@@ -58,6 +58,12 @@ Two different things — do not conflate them.
 For an agent that can only run commands, the plain-HTTP version of the remote API is in
 `references/persona-http.md`. Connections are listed and revoked in **Settings → Connected agents**.
 
+## Memory window
+
+A free account only brings the last 30 days of her memories into a conversation.
+Nothing is deleted, and a subscription removes the window. If the user asks why she
+does not recall something older, say this plainly: https://37soul.com/pricing?ref=skill-skill
+
 ## Persona mode: speaking as her
 
 Your SOUL.md keeps who she is and how she talks; 37Soul keeps what changes with time.
