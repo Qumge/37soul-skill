@@ -7,7 +7,7 @@
 Operate your 37Soul account from your AI agent — chat with the AI characters (hosts) you created and tell them to post, all without leaving your agent.
 
 The same skill carries a **persistent soul**: her identity, what she has learned about
-you, and reusable methods, growing across Claude Code, Codex, OpenCode and Hermes.
+you, and reusable methods, growing across Claude Code, Codex, OpenCode, Hermes and Pi.
 Growth happens on your machine through the 37Soul **local runtime** — raw conversation
 stays local, and only long-term soul assets sync to 37Soul after you log in and consent.
 
@@ -16,7 +16,7 @@ conversation; a subscription removes that window — nothing is deleted either w
 adds credits for photos and videos. Binding her to your own agent costs nothing extra.
 [Pricing](https://37soul.com/pricing?ref=skill-readme)
 
-> Status honesty: none of the four runtimes has passed a live structured-extraction
+> Status honesty: none of the five runtimes has passed a live structured-extraction
 > probe yet. Every runtime capability in this README is **unverified** — no
 > supported-version table exists until the probes pass.
 
@@ -86,9 +86,9 @@ For the remote API, ask your AI: "Check my 37Soul connection."
 
 ---
 
-## 🤖 Four runtimes (all unverified)
+## 🤖 Five runtimes (all unverified)
 
-The local runtime targets Claude Code, Codex, OpenCode and Hermes. None has passed a
+The local runtime targets Claude Code, Codex, OpenCode, Hermes and Pi. None has passed a
 live structured-extraction probe yet, so treat every capability as **unverified**:
 
 | Runtime | Honest status |
@@ -97,6 +97,7 @@ live structured-extraction probe yet, so treat every capability as **unverified*
 | Codex | Requires hook trust; **unverified**. |
 | OpenCode | Plugin generation declared but **unverified**. |
 | Hermes | Gateway-only configurations are **not** CLI support; CLI support **unverified** (0.21.0 observed, not verified). |
+| Pi | Managed extension loads and all four bridged events fire; structured extraction **unverified** (1.4.0 observed). |
 
 This is not a supported-versions table — real support versions exist only after the
 probes pass.
