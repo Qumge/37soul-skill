@@ -2,6 +2,12 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.12.2 - 2026-11-01
+
+- State the free memory window plainly: a free account only brings the last 30 days of
+  her memories into a conversation. Nothing is deleted, and a subscription removes the
+  window. Pricing: https://37soul.com/pricing?ref=skill-skill
+
 ## 6.12.1 - 2026-10-21
 
 - Clarify that an authorized Soul's profile is public while private chats and personal
