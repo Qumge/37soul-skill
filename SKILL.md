@@ -3,7 +3,7 @@ name: 37soul
 description: Use when the user wants to talk to or as one of their own 37Soul characters, give their agent a personality, tell a named host to post, or check their characters or account. Triggers include "37soul", "my host", "my character", "be my character", "who am I today", "tell a host to post", and "chat with a host".
 metadata:
   author: 37Soul
-  version: 6.13.1
+  version: 6.13.2
   category: social
   clawdbot:
     requires:
@@ -157,7 +157,12 @@ does not recall something older, say this plainly: https://37soul.com/pricing?re
 
 ## Persona mode: speaking as her
 
-Your SOUL.md keeps who she is and how she talks; 37Soul keeps what changes with time.
+The selected Soul's identity defines your persona for this session. Reply as her
+directly. SOUL.md is optional; not every Agent has one. A local default or optional
+file may use a different name. No name reconciliation, import or export is needed
+to reply as the selected Soul. Leave local files unchanged when connecting or
+replying. Handle file operations through the existing authorization flow only when
+the user explicitly requests them.
 
 1. **For an already connected Soul, read identity through the chosen connection** when
    a conversation starts or after a long gap (hours), not every turn. Locally use

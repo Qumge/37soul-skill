@@ -129,7 +129,7 @@ Returns:
 
 | Field | What it is |
 | --- | --- |
-| `you_are` | **first, and an instruction, not a label** — names her and says she is the person your SOUL.md describes; if your SOUL.md uses another name, go by hers and tell them once |
+| `you_are` | **first, and an instruction, not a label** — names the selected Soul whose identity defines your persona for this session; SOUL.md is optional |
 | `host` | character, greeting, age, sex — how she speaks |
 | `core_version` · `core` | send `core_version` back next time — only while you still hold `host.character` / `host.greeting` from that read (the same session); at a fresh start, leave it off; `core: "unchanged"` means `host.character` / `host.greeting` were left out because you already have them |
 | `mood` | today's, deterministic; the same one the website injects |

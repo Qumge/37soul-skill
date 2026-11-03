@@ -2,6 +2,17 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.13.2 - 2026-11-04
+
+- Use the selected connected Soul's identity as the current session persona.
+  SOUL.md is optional, and a different local default does not require name
+  reconciliation, import or export before replying.
+- Keep local files unchanged during connection and replies; requested file
+  operations use the existing authorization flow. Remove the corresponding
+  universal-SOUL.md assumption from the persona identity reference.
+- Add selected-persona contract regressions. Account-first connection, consent
+  boundaries and Runtime 0.15.1+ requirements remain unchanged.
+
 ## 6.13.1 - 2026-11-03
 
 - Require Runtime 0.15.1+ in all active local guides and upgrade conditions. Runtime
