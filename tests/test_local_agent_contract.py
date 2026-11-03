@@ -39,6 +39,8 @@ class LocalAgentContractTest(unittest.TestCase):
         rules = {
             "local preference despite remote tool": r"even if .*remote.*whoami",
             "internal scoped credential": r"active local scoped credential.*identity JSON",
+            "per-Soul identity consent": r"restored per-Soul identity consent",
+            "account login alone is insufficient": r"account-only login.*target-login needed.*no HTTP identity",
             "no OAuth fallback": r"no remote OAuth fallback",
             "consent before restore": r"already-consented.*website Soul",
             "hook-supplied native context": r"managed hook context.*agent.*session",
@@ -89,6 +91,29 @@ class LocalAgentContractTest(unittest.TestCase):
     def test_skill_does_not_freeze_the_number_of_agent_hosts(self):
         match = re.search(r"(?i)\b(?:four|five|six|[0-9]+) runtimes\b", read("SKILL.md"))
         self.assertFalse(match, "Skill hardcodes an agent runtime count")
+
+    def test_gemini_cursor_hooks_do_not_promise_automatic_extraction(self):
+        text = " ".join(read("SKILL.md").split())
+        pattern = (r"Gemini and Cursor.*native session formats.*"
+                   r"automatic extraction is currently unavailable.*"
+                   r"safe, tool-free native invocation")
+        self.assertTrue(re.search(pattern, text, re.I),
+                        "Gemini/Cursor need an explicit hooks-only capability boundary")
+
+    def test_manifest_descriptions_keep_approval_callbacks_out_of_chat(self):
+        marketplace = json.loads(read("marketplace.json"))
+        claude_marketplace = json.loads(read(".claude-plugin/marketplace.json"))
+        descriptions = {
+            "marketplace": marketplace["description"],
+            "marketplace skill": marketplace["skills"][0]["description"],
+            "plugin": json.loads(read(".claude-plugin/plugin.json"))["description"],
+            "Claude marketplace": claude_marketplace["description"],
+            "Claude marketplace plugin": claude_marketplace["plugins"][0]["description"],
+        }
+        missing = [name for name, text in descriptions.items()
+                   if "Never ask users to paste credentials or localhost approval callback URLs."
+                   not in text]
+        self.assertFalse(missing, "Missing discovery-time callback prohibition: " + repr(missing))
 
     def test_skill_and_plugin_versions_match_latest_changelog(self):
         latest = re.search(r"^## (\d+\.\d+\.\d+) -", read("CHANGELOG.md"), re.M).group(1)

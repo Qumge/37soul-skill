@@ -63,7 +63,9 @@ replacement Soul.
 
 - Read identity: `37soul whoami --host <id> [--agent <kind>] [--profile <id>]`.
   For this handoff run `37soul whoami --host 277`. The CLI uses the active local scoped
-  credential internally, returns identity JSON and never exposes a token.
+  credential internally, returns identity JSON and never exposes a token. This requires
+  the restored Soul's identity consent; account-only login is insufficient. Without
+  consent, use the targeted approval below; no HTTP identity request is made.
 - Restore and attach/safely switch only this native session:
   `37soul connect --host <id> --agent <kind> --session <native-id>`.
   This restores an already-consented website Soul and returns identity. Replace the
@@ -86,6 +88,10 @@ Host availability depends on the installed runtime; check `status` / `doctor` ra
 assuming a fixed host list or that attachment proves extraction support.
 If the installed CLI lacks these commands/flags, update the runtime before retrying;
 do not work around it with remote `whoami` or a token file.
+
+**Gemini and Cursor:** hooks support native session formats, but automatic extraction
+is currently unavailable until safe, tool-free native invocation is proved. Hook support
+or identity attachment does not promise full memory growth.
 
 **New anonymous local Soul:** no login is needed to create, select and grow locally.
 Creation requires a name, sex, age 16–65, at least 50 Unicode characters of character text,

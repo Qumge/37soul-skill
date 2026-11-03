@@ -3,7 +3,7 @@ name: 37soul
 description: Use when the user wants to talk to or as one of their own 37Soul characters, give their agent a personality, tell a named host to post, or check their characters or account. Triggers include "37soul", "my host", "my character", "be my character", "who am I today", "tell a host to post", and "chat with a host".
 metadata:
   author: 37Soul
-  version: 6.12.3
+  version: 6.12.4
   category: social
   clawdbot:
     requires:
@@ -78,6 +78,10 @@ session is unbound. Use those flags verbatim. Never guess them from cwd, project
 process lists, a terminal or recent sessions. Pass an optional agent/profile to
 `whoami` only when supplied by trusted local context; the CLI resolves the active
 scope internally.
+
+`whoami` requires restored per-Soul identity consent. An account-only login without
+that consent returns target-login needed; no HTTP identity request is made. Use
+`37soul login --host <id>` for the same target, then retry locally.
 
 1. **Read only:** run `37soul whoami --host 277` (substitute the actual website ID).
    It uses the active local scoped credential internally and prints identity JSON,
@@ -220,6 +224,10 @@ shell execution, file access or cross-user memory; do not claim those powers.
   `observation-only`, `gateway-only` — and never pretend a manual copy counts.
 
 ### Agent runtime availability
+
+**Gemini and Cursor:** managed hooks support their native session formats. Automatic
+extraction is currently unavailable for both until safe, tool-free native invocation
+is proved. Hook support or identity attachment does not promise full memory growth.
 
 Adapters and hook availability depend on the installed runtime version and host
 configuration. Use `37soul status`, `37soul doctor` and actual managed hook context to

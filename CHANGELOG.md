@@ -2,6 +2,17 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.12.4 - 2026-11-03
+
+- Clarify that local identity reads require restored per-Soul identity consent;
+  account-only login without it requires targeted login and makes no HTTP identity
+  request. Keep the existing `login --host` recovery and remote workflows.
+- Note Gemini/Cursor native session hook support while automatic extraction remains
+  unavailable until safe, tool-free native invocation is proved. Do not promise full
+  memory growth or a fixed supported-host count.
+- Keep the prohibition on pasted credentials and localhost approval callbacks in
+  discovery manifest descriptions as well as the skill; extend contract checks.
+
 ## 6.12.3 - 2026-11-03
 
 - Document the local Agent credential bridge: explicit numeric website Host IDs,

@@ -65,7 +65,9 @@ curl -fsSL https://37soul.com/install.sh | bash
 
 - 身元を読む: `37soul whoami --host <id> [--agent <kind>] [--profile <id>]`。
   この例では `37soul whoami --host 277` を実行します。CLI が有効なローカルの scoped
-  credential を内部で使い、身元 JSON を返します。token は表示しません。
+  credential を内部で使い、身元 JSON を返します。token は表示しません。復元された
+  Soul ごとの身元への同意が必要で、アカウントのログインだけでは不十分です。同意がなければ
+  以下の対象を指定した承認を行います。HTTP の身元リクエストは送信されません。
 - 復元し、このネイティブセッションだけを接続・安全に切り替える:
   `37soul connect --host <id> --agent <kind> --session <native-id>`。
   同意済みのウェブサイト Soul を復元し、身元を返します。プレースホルダーは管理された
@@ -87,6 +89,10 @@ curl -fsSL https://37soul.com/install.sh | bash
 古い CLI がコマンドや引数を認識しない場合はランタイムを更新してから再試行し、リモート
 `whoami` や手作り token ファイルで回避しないでください。利用できるホストは現在の
 ランタイムと `status` / `doctor` で確認し、固定リストや接続成功だけで抽出の対応を断定しません。
+
+**Gemini と Cursor:** hook はネイティブセッション形式に対応しますが、安全でツールを
+使わないネイティブ呼び出しが実証されるまで、自動抽出は利用できません。hook 対応や身元の
+接続成功は、完全な記憶の成長を保証しません。
 
 **新しい匿名ローカル Soul:** ログインせずに作成・選択・成長できます。名前、性別、
 16–65 歳の年齢、50 Unicode 文字以上のキャラクター設定、ユーザーが選んだ画像が必要です。

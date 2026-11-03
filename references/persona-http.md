@@ -15,6 +15,10 @@ The website handoff `/agent_access?host_id=277` supplies the numeric Host ID: us
 | Restore and attach this session | `37soul connect --host <id> --agent <kind> --session <native-id>` |
 | Targeted approval | `37soul login --host <id>` |
 
+`whoami` requires restored per-Soul identity consent. An account-only login without
+that consent returns target-login needed; no HTTP identity request is made. Use
+`37soul login --host <id>` for the same target, then retry locally.
+
 `37soul whoami --host 277` uses the active local scoped credential internally and
 prints identity JSON, never a token. There is **no remote OAuth fallback**. Optional
 agent/profile selectors come only from trusted local context, not from credential

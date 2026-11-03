@@ -62,7 +62,8 @@ curl -fsSL https://37soul.com/install.sh | bash
 
 - 读取身份：`37soul whoami --host <id> [--agent <kind>] [--profile <id>]`。
   本例运行 `37soul whoami --host 277`。CLI 在内部使用当前有效的本地 scoped credential，
-  返回身份 JSON，不暴露 token。
+  返回身份 JSON，不暴露 token。需先恢复这个 Soul 的身份同意；只有账号登录还不够。
+  缺少同意时按下方目标授权流程处理，不发送 HTTP 身份请求。
 - 恢复并绑定，或安全切换这个原生会话：
   `37soul connect --host <id> --agent <kind> --session <native-id>`。
   它恢复已同意授权的网站 Soul 并返回身份。占位符只能替换为受管理 hook 上下文提供的
@@ -79,6 +80,9 @@ curl -fsSL https://37soul.com/install.sh | bash
 `whoami` 的可选 agent/profile 也只能取自可信本地上下文。旧 CLI 不认识这些命令或参数时，
 先更新运行时再重试，不能通过远程 `whoami` 或手写 token 文件绕过。宿主可用性以当前运行时
 及 `status` / `doctor` 为准；不能固定宿主列表，也不能把绑定成功当成提取能力已验证。
+
+**Gemini 和 Cursor：** hook 支持原生会话格式；在证明原生调用安全且不使用工具之前，
+自动提取当前明确不可用。hook 支持或身份绑定成功不代表完整记忆生长可用。
 
 **新建匿名本地 Soul：** 无需登录即可创建、选择和在本地培养。创建必须提供名字、性别、
 16–65 岁年龄、至少 50 个 Unicode 字符的角色描述，以及用户选定的图片（必填，授权上传前
