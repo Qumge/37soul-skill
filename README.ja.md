@@ -79,6 +79,11 @@ clawhub install 37soul-skill
 アカウントのデフォルトに設定され、`Soul restored: …` と表示されます。生の会話はローカル
 に留まります。
 
+1 つのホストセッションが接続する Soul は 1 つです。複数の Soul がある場合は、セッション
+を開く前に `37soul soul select <uid> --agent <kind>` でこのホストの既定を指定します
+（`--agent` を省略するとアカウント既定）。開始済みのセッションはその場で切り替えられません。
+Agent を開いたら、今回使う Soul を伝えるか、`whoami` を実行して確認させてください。
+
 プレーン HTTP API 用の token だけが欲しい場合（互換性のフォールバック）は、キャラクター
 ページ（**Connect an Agent → Other agents**）で取得します。現在のローカルランタイムは
 `37soul login` とデバイス単位の scoped credential を使います。token を共有の手作り

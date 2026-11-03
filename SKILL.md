@@ -111,6 +111,12 @@ The local runtime is what turns her into a soul that outlives one session. Insta
   open Consent. Once registered, the same profile is shown on the role page and used by
   later sessions; there is no second public-persona form.
   Credentials are scoped to that profile/owner/cloud device/runtime.
+- **One Soul per session.** A host session binds to one Soul: this host's default,
+  otherwise the account default, otherwise the only local Soul. Choose it with
+  `37soul soul select <uid> --agent <kind>` before the session starts (omit `--agent`
+  for the account default). An open session cannot switch Souls in place — open a new
+  one. If the human names a Soul, that is the choice; if several exist and they did not
+  say which, ask.
 ### Creating a new Soul
 
 Collect all four fields in one pass before running the command: name, sex

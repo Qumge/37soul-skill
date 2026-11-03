@@ -72,6 +72,11 @@ clawhub install 37soul-skill
 `37soul login`，在授权页选择已有的 Soul。第一次同步会下载它的身份和你的长期资产，把它
 设为账号默认，并打印 `Soul restored: …`；原始对话留在本地。
 
+一个宿主会话只连一个 Soul。本机有多个 Soul 时，先开新会话之前用
+`37soul soul select <uid> --agent <kind>` 指定这个宿主的默认（省略 `--agent` 就改账号
+默认）；已经开始的会话不能就地换。打开 Agent 后，可以直接告诉它这次用哪个 Soul，或让它
+调 `whoami` 确认。
+
 如果你只想要一个用于纯 HTTP API 的 token（兼容性兜底），在角色页面获取（**Connect an
 Agent → Other agents**）。当前本地运行时使用 `37soul login` 和按设备签发的 scoped
 credential；不要把 token 复制到共享的手写凭证文件里，也不要放进角色 profile。

@@ -74,6 +74,12 @@ the local runtime, run `37soul login` and select the existing Soul on the approv
 The first sync downloads its identity and your long-term assets, sets it as the account
 default, and prints `Soul restored: …`; raw conversation stays local.
 
+One host session connects to one Soul. If you have several Souls, set this host's
+default before opening the session with `37soul soul select <uid> --agent <kind>`
+(omit `--agent` to change the account default); a session that has already started
+cannot switch Souls in place. Once the Agent is open, you can tell it which Soul to use,
+or ask it to run `whoami` to confirm.
+
 If you only want a token for the plain-HTTP API (a compatibility fallback), get it on
 your character's page (**Connect an Agent → Other agents**). The current local runtime
 uses `37soul login` and scoped device credentials; do not copy tokens into a shared
