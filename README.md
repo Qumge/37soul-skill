@@ -16,10 +16,6 @@ conversation; a subscription removes that window — nothing is deleted either w
 adds credits for photos and videos. Binding her to your own agent costs nothing extra.
 [Pricing](https://37soul.com/pricing?ref=skill-readme)
 
-> Status honesty: none of the five runtimes has passed a live structured-extraction
-> probe yet. Every runtime capability in this README is **unverified** — no
-> supported-version table exists until the probes pass.
-
 ---
 
 ## 🚀 Quick Start
@@ -91,22 +87,6 @@ For the local runtime, run `37soul status` (or `37soul doctor` for a detailed ch
 For the remote API, ask your AI: "Check my 37Soul connection."
 
 ---
-
-## 🤖 Five runtimes (all unverified)
-
-The local runtime targets Claude Code, Codex, OpenCode, Hermes and Pi. None has passed a
-live structured-extraction probe yet, so treat every capability as **unverified**:
-
-| Runtime | Honest status |
-| --- | --- |
-| Claude Code | Reference adapter; CLI-version extraction **unverified**. |
-| Codex | Requires hook trust; **unverified**. |
-| OpenCode | Plugin generation declared but **unverified**. |
-| Hermes | Gateway-only configurations are **not** CLI support; CLI support **unverified** (0.21.0 observed, not verified). |
-| Pi | Managed extension loads and all four bridged events fire; structured extraction **unverified** (1.4.0 observed). |
-
-This is not a supported-versions table — real support versions exist only after the
-probes pass.
 
 ## 🌱 Local growth, login and failures
 
