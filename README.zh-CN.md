@@ -58,34 +58,48 @@ curl -fsSL https://37soul.com/install.sh | bash
 ```
 
 **要求 Runtime 0.15.0+。** 0.15.0 当前是尚未发布的候选版本；已发布的 0.14.2 不识别
-`whoami`、`connect` 或 `--host`，重装该已发布版本也不会启用此连接桥。只能使用明确提供的
+`hosts` / `connect` / `whoami` 连接桥及 `--host` 目标参数，重装该已发布版本也不会启用它们。只能使用明确提供的
 兼容本地候选包，或等待正式发布。遇到未知命令或参数时停止本地连接流程，不要再运行登录、
 触发额外远程 OAuth 或改写 token 文件。明确选择的远程/operator 流程仍独立可用。
 
-**已有网站 Soul：** 沿用网站交接提供的数字 Host ID。
-`/agent_access?host_id=277` 表示目标 `277`，不是本地 Soul UUID。不要新建替代角色。
+**默认流程：** 安装兼容运行时后，先运行一次 `37soul login`。这只是账号登录，
+不选择 Soul。然后告诉 Agent「连接 Sophia Ramirez」。账号有效时，可以选择任意自有 Soul，
+不需要第二次登录或 OAuth。
 
-- 读取身份：`37soul whoami --host <id> [--agent <kind>] [--profile <id>]`。
-  本例运行 `37soul whoami --host 277`。CLI 在内部使用当前有效的本地 scoped credential，
-  返回身份 JSON，不暴露 token。需先恢复这个 Soul 的身份同意；只有账号登录还不够。
-  缺少同意时按下方目标授权流程处理，不发送 HTTP 身份请求。
-- 恢复并绑定，或安全切换这个原生会话：
-  `37soul connect --host <id> --agent <kind> --session <native-id>`。
-  它恢复已同意授权的网站 Soul 并返回身份。占位符只能替换为受管理 hook 上下文提供的
-  确切 agent 类型和原生会话 ID。`SessionStart` / `UserPromptSubmit` 即使在未绑定时也会提供
-  精确参数；不得从 cwd、终端或最近会话猜测，也不得顺手修改其他会话或默认。
-- 缺少授权或已撤销：`37soul login --host <id>`；本例运行 `37soul login --host 277`。
-  浏览器授权页会预选这个 Soul。用户在浏览器完成授权后，再重试本地命令，不回退到远程 OAuth。
+| 用途 | 本地命令契约 |
+| --- | --- |
+| 账号登录/恢复 | `37soul login` |
+| 自有角色目录 | `37soul hosts [--name <exact-name>] [--limit <n>] [--offset <n>]` |
+| 按完整名字连接 | `37soul connect --name <exact-name> --agent <kind> --session <native-id>` |
+| 按数字 ID 连接 | `37soul connect --host <id> --agent <kind> --session <native-id>` |
+| 连接后只读身份 | `37soul whoami --host <id> [--agent <kind>] [--profile <id>]` |
 
-没有真实 hook 会话上下文时，用本地 `whoami` 读取身份，不运行 `connect`，也不能声称记忆
-已经绑定。读取身份本身不会绑定记忆；绑定需要真实 hook 上下文、返回的目标身份一致，且
-`connect` 响应满足 `connection.state == "attached"`。没有 hook source 时，发送下一条消息，
-让 `UserPromptSubmit` 提供精确上下文后再重试。切换会在字节截断点建立新的云端 `session_ref`，
-隔离之前的历史；原生会话保持打开，无需重启控制台。
-`whoami` 的可选 agent/profile 也只能取自可信本地上下文。旧 CLI 不认识这些命令或参数时，
-按上方版本门槛停止处理，不能再次登录、通过远程 `whoami`、额外 OAuth 或手写 token 文件绕过。
-宿主可用性以当前运行时
-及 `status` / `doctor` 为准；不能固定宿主列表，也不能把绑定成功当成提取能力已验证。
+流程示例；占位符只能替换为受管理 hook 提供的精确参数：
+```text
+37soul login
+37soul hosts --name "Sophia Ramirez"
+37soul connect --name "Sophia Ramirez" --agent <kind> --session <native-id>
+```
+
+`hosts` 在内部使用当前 scoped credential，只列出当前账号自有角色的 ID、名字和
+`soul_uid`，不读取身份或记忆。名字按不区分大小写的完整名字精确匹配；重名会拒绝连接，
+必须请用户从返回结果中选定 ID 后使用 `--host`。零匹配时询问正确名字/ID，不创建替代角色，
+也不捏造匹配。网站交接 `/agent_access?host_id=277` 可直接提供数字 `--host 277`，不是 Soul UUID。
+
+首次显式 `connect` 通过已登录账号，只为选定的自有 Soul 授予/恢复窄范围同意。此前已撤销或
+禁用的同意仍会被拒绝，不得静默扩大类别、重新启用，或通过登录绕过。返回身份 JSON 后，
+只有目标一致且 `connection.state == "attached"`，才能报告记忆已绑定。
+
+`SessionStart` / `UserPromptSubmit` 即使在原生会话未绑定时，也提供精确 `--agent` / `--session`
+参数。不得从 cwd、终端或最近会话猜测，也不得修改其他会话/默认。没有真实 hook 上下文时
+不运行连接、不声称记忆已绑定；发送下一条消息，让 `UserPromptSubmit` 提供参数后再试。
+切换在字节截断点建立新云端 `session_ref`，隔离此前历史；原生会话保持打开，无需重启控制台。
+
+`whoami` 是连接后的只读身份操作，不能作为选择未连接 Soul 的登录前置条件。它在内部使用
+scoped credential，不暴露 token。连接前只允许读取目录元数据；账号登录和初始 hook 不预载
+未选择 Soul 的身份或记忆。若此前已连接，缺少新的原生会话上下文时仍可只读已恢复身份。
+可选 agent/profile 只取自可信上下文。账号凭据缺失/撤销时使用普通 `37soul login`；
+Soul 尚未连接时使用显式 `connect`。未知命令按上方版本门槛停止，不通过再登录或远程 OAuth 绕过。
 
 **Gemini 和 Cursor：** hook 支持原生会话格式；在证明原生调用安全且不使用工具之前，
 自动提取当前明确不可用。hook 支持或身份绑定成功不代表完整记忆生长可用。
@@ -175,8 +189,9 @@ HTTP 授权，详见 [HTTP 兼容说明](references/persona-http.md)。
 
 ## 🔧 排障
 
-本地 persona 鉴权失败时，对同一个数字目标运行 `37soul login --host <id>`，在浏览器完成
-授权后重试本地命令。缺少原生会话上下文时，读到身份仍不代表记忆已绑定。
+本地账号凭据缺失/撤销时运行普通 `37soul login`，不选择 Soul。自有 Soul 尚未连接时应
+显式连接，而不是再次登录。已撤销/禁用的 Soul 同意必须保持拒绝，不能通过登录绕过。
+缺少原生 hook 上下文时等待下一条消息，不猜会话、不重启；未知命令/参数按版本门槛停止。
 明确使用远程连接时，重新连接其 OAuth，或由用户在对话外修复远程授权。不要打印 token
 或原始鉴权错误。
 

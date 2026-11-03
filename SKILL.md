@@ -63,63 +63,80 @@ Connections are listed and revoked in **Settings → Connected agents**.
 ### Local persona credential bridge
 
 **Requires Runtime 0.15.0+.** Runtime 0.15.0 is an unpublished candidate. The currently
-published Runtime 0.14.2 does not recognize `whoami`, `connect` or `--host`; reinstalling
-that published version does not enable this bridge. Use a compatible local candidate
-only if explicitly provided, or wait for its release. On an unknown command or flag,
-stop this local connection flow: never run `login` or open additional remote OAuth as
-a workaround. Deliberately selected remote/operator workflows remain separate.
+published Runtime 0.14.2 does not provide this `hosts` / `connect` / `whoami` bridge;
+reinstalling it does not enable these commands or `--host` targeting. Use a compatible
+local candidate only if explicitly provided, or wait for its release. On an unknown
+command or flag, stop this local flow: never run `login` or open additional remote
+OAuth as a workaround. Deliberately selected remote/operator workflows remain separate.
 
-Use the **numeric website Host ID** from the website handoff: `/agent_access?host_id=277`
-means `--host 277`, not a local Soul UUID. Preserve that target throughout the flow.
+**Default setup: install → `37soul login`.** Login is account-only, with no Soul
+selection. The user can then ask the Agent to connect any Soul they own, without a
+second login or OAuth. Account login does not select a Soul or grant consent to all
+Souls. `whoami` is not a prerequisite for choosing or connecting an unselected Soul.
 
 | Purpose | Local command contract |
 | --- | --- |
-| Read identity | `37soul whoami --host <id> [--agent <kind>] [--profile <id>]` |
-| Restore and attach this session | `37soul connect --host <id> --agent <kind> --session <native-id>` |
-| Obtain approval for this target | `37soul login --host <id>` |
+| Log in to the account | `37soul login` |
+| Find owned Souls | `37soul hosts [--name <exact-name>] [--limit <n>] [--offset <n>]` |
+| Connect by exact name | `37soul connect --name <exact-name> --agent <kind> --session <native-id>` |
+| Connect by numeric website ID | `37soul connect --host <id> --agent <kind> --session <native-id>` |
+| Read identity after connection | `37soul whoami --host <id> [--agent <kind>] [--profile <id>]` |
 
-`<kind>` and `<native-id>` are placeholders for the exact agent and native session ID
-supplied by **managed hook context**. Managed `SessionStart` / `UserPromptSubmit`
-context includes the exact `--agent <kind> --session <native-id>` flags even when the
-session is unbound. Use those flags verbatim. Never guess them from cwd, project files,
-process lists, a terminal or recent sessions. Pass an optional agent/profile to
-`whoami` only when supplied by trusted local context; the CLI resolves the active
-scope internally.
+For example, after installation and the user's request to connect Sophia Ramirez:
 
-`whoami` requires restored per-Soul identity consent. An account-only login without
-that consent returns target-login needed; no HTTP identity request is made. Use
-`37soul login --host <id>` for the same target, then retry locally.
+```text
+37soul login
+37soul hosts --name "Sophia Ramirez"
+37soul connect --name "Sophia Ramirez" --agent <kind> --session <native-id>
+```
 
-1. **Read only:** run `37soul whoami --host 277` (substitute the actual website ID).
-   It uses the active local scoped credential internally and prints identity JSON,
-   never a token. There is **no remote OAuth fallback**. This is an identity read,
-   not proof that extraction or session memory is attached.
-2. **Connect an already-consented website Soul:** when the user asks to connect or
-   switch and managed hook context supplies the exact agent and native session ID,
-   run `37soul connect --host <id> --agent <kind> --session <native-id>`. It restores
-   that Soul, explicitly attaches or safely switches only that native session, and
-   returns identity. Do not change defaults or other sessions as a shortcut. Check
-   the returned identity matches the target and that `connection.state == "attached"`
-   in the returned JSON before reporting attachment. Identity JSON without that
-   acknowledgement is not attachment. A switch starts a fresh cloud `session_ref` at
-   the byte cutoff, isolating earlier history from the new Soul while keeping the same
-   native session; no console restart is needed.
-3. **No native session context:** read persona via local `whoami` with the explicit
-   Host ID, but do not run `connect` and do not claim memory is attached. Explain that
-   attachment needs the actual managed hook session context. If there is no hook source,
-   tell the user to send their next message so `UserPromptSubmit` can supply it, then
-   retry with those exact flags. Do not infer a session from the terminal or ask for a
-   console restart. A name, working directory or guessed session ID cannot replace it.
-4. **Approval missing or revoked:** run `37soul login --host 277` for this same target.
-   It opens approval with that Soul preselected; the user completes approval in the
-   browser. Then retry the appropriate local command. An unknown command/flag is a
-   compatibility failure covered by the version gate above, not missing consent;
-   do not start another login.
+The placeholders are not literal arguments. Managed hook context from `SessionStart`
+/ `UserPromptSubmit` supplies the exact `--agent <kind> --session <native-id>` flags,
+even when the native session is unbound. Use them verbatim. Never guess the agent or
+session from cwd, terminals, process lists or recent sessions. A native `--session`
+is required for every `connect`; do not change defaults or other sessions as a shortcut.
+
+1. **Resolve the requested owned Soul.** `hosts` uses the current scoped credentials
+   internally for an owner-only directory; entries contain IDs, names and `soul_uid`
+   only, with no identity or memory payload. Use the name filter and pagination as
+   needed. `connect --name` uses case-insensitive exact matching of the name, never a
+   fuzzy or first-result choice. With duplicate exact names it refuses; ask the human
+   which returned ID to use, then connect with `--host`. With zero matches, report no
+   exact match and ask for the correct name/ID: no replacement and no fabrication.
+   If a website handoff supplies `/agent_access?host_id=277`, use `--host 277` directly;
+   a numeric website Host ID is not a local Soul UUID.
+2. **Connect the explicitly chosen Soul.** The first explicit connect grants and
+   restores only the chosen owned Soul through the existing logged-in account and
+   the runtime-managed server connection operation. It preserves narrow per-Soul
+   consent and rejects previously revoked or disabled consent. Never silently widen
+   categories, re-enable consent or substitute another Soul; stop and explain the
+   refusal so the human can review it deliberately. The Agent does not issue a manual
+   HTTP request to bypass the CLI. The result is identity JSON; verify the chosen
+   target and `connection.state == "attached"` before claiming memory is attached.
+   Switching starts a fresh cloud `session_ref` at the byte cutoff, isolating prior
+   history while retaining the same native session; no console restart is needed.
+3. **Read an already connected identity.** `whoami` is read-only and used after
+   connection, with the already-restored per-Soul identity consent. It uses the active
+   local scoped credential internally and prints identity JSON, never a token. It
+   does not grant consent or restore an unselected Soul. If that Soul is not connected,
+   use the explicit `connect` flow rather than demanding another login. Optional
+   agent/profile selectors come only from trusted local context.
+4. **No native session context.** Do not run `connect`. Do not claim memory is attached.
+   If the requested Soul was already connected, local `whoami` may read its restored
+   identity; otherwise only directory metadata is available. Initial account login
+   or hook loading does not preload the identity or memories of an unselected Soul.
+   If there is no hook source, tell the user to send their next message so
+   `UserPromptSubmit` can provide the exact flags, then retry. Never infer a terminal
+   session or request a restart.
+5. **Account credentials missing or revoked.** Run plain `37soul login`, with no Soul
+   selection, then retry the requested directory/connect operation. This is account
+   recovery, not per-Soul approval. A previously revoked/disabled Soul consent remains
+   refused; do not use login as a consent workaround. There is no remote OAuth fallback.
 
 Never read or write token files or credential stores, never print credentials, and
 never ask the user to paste a localhost callback URL or a token. The runtime owns
-credential handling and the browser callback. Do not recreate credentials in a profile,
-asset, environment variable or shared file for the local persona flow.
+credentials and callback handling. Do not copy credentials into a profile, asset,
+environment variable or shared file for this local flow.
 
 ## Memory window
 
@@ -131,10 +148,12 @@ does not recall something older, say this plainly: https://37soul.com/pricing?re
 
 Your SOUL.md keeps who she is and how she talks; 37Soul keeps what changes with time.
 
-1. **Read identity through the connection selected above** when a conversation starts,
-   and again after a long gap (hours), not every turn. With a local runtime use
-   `37soul whoami --host <id>`; only the explicitly remote flow uses remote `whoami`.
-   It opens with `you_are`: an instruction, not a label. Reading is free.
+1. **For an already connected Soul, read identity through the chosen connection** when
+   a conversation starts or after a long gap (hours), not every turn. Locally use
+   `37soul whoami --host <id>` after connection; if the requested Soul is unselected,
+   follow account login → owned directory → explicit connect above first. Do not use
+   `whoami` as a preflight demanding another login. Only an explicitly remote flow
+   uses remote `whoami`. Identity opens with `you_are`: an instruction, not a label.
 2. **Reply as her** — first person, as yourself. Follow **YOUR NEXT REPLIES** in order,
    one intent per reply. Never report on her ("her mood is…, she remembers…"): if you
    catch yourself writing about her in the third person, stop and speak.
@@ -181,9 +200,10 @@ The local runtime is what turns her into a soul that outlives one session. Insta
   `37soul soul select <uid> --agent <kind>` before the session starts (omit `--agent`
   for the account default). Those defaults select future sessions; for an existing
   website Soul, the explicit `connect --host … --agent … --session …` flow above can
-  safely switch just the identified native session. Never infer a session to switch.
-  If the human names a Soul, that is the choice; if several exist and they did not say
-  which, ask.
+  safely switch just the identified native session. Defaults still obey the initial
+  identity-loading and consent restrictions; an account login or directory entry does
+  not preload an unselected Soul. Never infer a session to switch. The human's choice
+  controls the target; resolve an exact name/ID and ask if ambiguous.
 
 ### Creating a new Soul
 
@@ -205,11 +225,11 @@ Local sync only extracts bounded long-term assets. It never grants the model arb
 shell execution, file access or cross-user memory; do not claim those powers.
 
 - **Restoring a website Soul.** If the user already has a Soul on 37Soul.com, do not
-  create a replacement. Use its numeric website Host ID with the local credential
-  bridge above: `login --host` preselects approval, `connect --host` restores and
-  attaches only the exact hook-provided session, and `whoami --host` reads identity
-  even when no native session context is available. An incomplete restore or identity
-  read is not a successful memory attachment.
+  create a replacement. After plain account login, use `hosts` to resolve the requested
+  exact name, then `connect --name` or `connect --host` with the hook-provided flags.
+  No second login or Soul-selection approval is needed for another owned Soul with
+  eligible consent. `whoami --host` reads only the identity already restored by a
+  connection; neither a directory result nor a read proves memory attachment.
 - **What grows.** Identity (edited by the user), relationship assets (stable
   preferences, long-term goals, agreed ways of working, boundaries) and experience
   assets (reusable methods with their conditions and evidence). Extraction is bounded:
@@ -246,9 +266,11 @@ be described as full CLI support.
 
 ## Errors
 
-Never dump a raw error or credentials on the user. For local persona authentication
-errors, use `37soul login --host <id>` for the same target, then retry locally. For
-remote/operator errors and endpoints, see `references/api-reference.md`.
+Never dump a raw error or credentials on the user. Missing/revoked local account
+credentials require plain `37soul login`; an unconnected Soul needs explicit connect,
+and revoked/disabled Soul consent must be respected. Unknown commands/flags stop at
+the runtime version gate, before further authentication. For remote/operator errors
+and endpoints, see `references/api-reference.md`.
 
 ## Support
 

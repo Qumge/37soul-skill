@@ -6,36 +6,26 @@ All notable changes to the 37Soul Skill will be documented in this file.
 
 Unreleased documentation; the Skill/plugin has not been published.
 
-- Gate local identity/connection commands on Runtime 0.15.0+. The 0.15.0 candidate
-  is not published; published 0.14.2 lacks `whoami`, `connect` and `--host`. Unknown
-  commands/flags stop the flow before login or extra OAuth, pending a compatible
-  candidate or release.
-- Clarify that local identity reads require restored per-Soul identity consent;
-  account-only login without it requires targeted login and makes no HTTP identity
-  request. Keep the existing `login --host` recovery and remote workflows.
-- Note Gemini/Cursor native session hook support while automatic extraction remains
-  unavailable until safe, tool-free native invocation is proved. Do not promise full
-  memory growth or a fixed supported-host count.
-- Keep the prohibition on pasted credentials and localhost approval callbacks in
-  discovery manifest descriptions as well as the skill; extend contract checks.
-
-- Document the local Agent credential bridge: explicit numeric website Host IDs,
-  local scoped identity reads, targeted browser approval, and restore/attach or safe
-  switch of only the exact managed-hook native session. Identity reads without native
-  session context do not establish memory attachment. Require `connection.state` to be
-  `attached`; use exact `SessionStart` / `UserPromptSubmit` flags, including unbound
-  sessions, and request the next message if hook context is absent. A fresh cloud
-  `session_ref` at the byte cutoff isolates switch history without a console restart.
-- Prefer local persona commands even when a plugin exposes remote `whoami`; never
-  read/write credential files, expose credentials, request pasted localhost callbacks,
-  or fall back to remote OAuth after local authentication fails. Keep deliberately
-  selected remote workflows, remote-only apps and operator operations available.
-- Align English/Chinese/Japanese setup and HTTP/operator references, require a
-  user-chosen image for new local Souls, and synchronize skill/plugin versions.
-- Avoid a fixed host count; availability follows the installed runtime and verified
-  hook/extraction evidence rather than a hardcoded list.
-- Add zero-dependency documentation contract checks. These validate documentation,
-  not the separately implemented runtime or a live website/session connection.
+- Default local setup is install → plain account login, with no Soul selection.
+  Agents can then connect any eligible owned Soul by exact name or numeric ID without
+  a second login/OAuth. Account credential recovery also uses plain login.
+- Document the minimal owner-only `hosts` directory and runtime-managed explicit
+  connection operation. Case-insensitive exact names must be unique; ask the human
+  for an ID on duplicates, and never fabricate/create a replacement on zero matches.
+- First explicit connect establishes/restores narrow consent only for the selected
+  owned Soul; previously revoked/disabled consent stays rejected. Identity reads are
+  read-only after connection, never a prerequisite for selecting another Soul.
+- Keep initial identity-loading restrictions, exact managed-hook native flags,
+  explicit `attached` acknowledgement and history isolation at the byte cutoff.
+  Missing hook context requires the next message, never a guessed session or restart.
+- Require Runtime 0.15.0+: 0.15.0 is an unpublished candidate and published 0.14.2 lacks
+  the local bridge. Unknown commands/flags stop before additional login or OAuth.
+- Keep local persona credentials internal, prohibit pasted credentials/localhost
+  callbacks in skill and discovery manifests, and preserve explicit remote/operator
+  workflows. Gemini/Cursor native hooks do not promise automatic extraction or full
+  memory growth until safe, tool-free native invocation is proved.
+- Align the skill, README languages, references and contract checks; require a
+  user-chosen image for new local Souls and avoid a fixed supported-host count.
 
 ## 6.12.2 - 2026-11-01
 

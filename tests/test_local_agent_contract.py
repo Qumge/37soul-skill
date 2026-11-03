@@ -18,9 +18,11 @@ ACTIVE_DOCS = ENTRYPOINTS + (
     "references/api-reference.md", "references/operator-mode.md",
 )
 COMMANDS = (
-    "37soul whoami --host <id> [--agent <kind>] [--profile <id>]",
+    "37soul login",
+    "37soul hosts [--name <exact-name>] [--limit <n>] [--offset <n>]",
+    "37soul connect --name <exact-name> --agent <kind> --session <native-id>",
     "37soul connect --host <id> --agent <kind> --session <native-id>",
-    "37soul login --host <id>",
+    "37soul whoami --host <id> [--agent <kind>] [--profile <id>]",
 )
 
 
@@ -29,9 +31,9 @@ def read(name):
 
 
 class LocalAgentContractTest(unittest.TestCase):
-    def test_persona_entrypoints_offer_explicit_host_commands(self):
+    def test_persona_entrypoints_offer_account_and_soul_commands(self):
         missing = [f"{name}: {command}" for name in ENTRYPOINTS
-                   for command in COMMANDS if command not in read(name)]
+                   for command in COMMANDS if f"`{command}`" not in read(name)]
         self.assertFalse(missing, "Missing local command contracts: " + repr(missing))
 
     def test_persona_guidance_covers_credential_and_session_boundaries(self):
@@ -39,10 +41,10 @@ class LocalAgentContractTest(unittest.TestCase):
         rules = {
             "local preference despite remote tool": r"even if .*remote.*whoami",
             "internal scoped credential": r"active local scoped credential.*identity JSON",
-            "per-Soul identity consent": r"restored per-Soul identity consent",
-            "account login alone is insufficient": r"account-only login.*target-login needed.*no HTTP identity",
+            "read only after connection": r"whoami.*read-only.*after connection",
+            "no second authentication for an owned Soul": r"without a second login or OAuth",
             "no OAuth fallback": r"no remote OAuth fallback",
-            "consent before restore": r"already-consented.*website Soul",
+            "explicit connect grants only the chosen Soul": r"first explicit connect.*grants.*restores.*only.*owned Soul",
             "hook-supplied native context": r"managed hook context.*agent.*session",
             "no session guessing": r"never guess.*cwd.*recent sessions",
             "identity is not attachment": r"do not claim.*memory.*attached",
@@ -55,6 +57,45 @@ class LocalAgentContractTest(unittest.TestCase):
                    for label, pattern in rules.items()
                    if not re.search(pattern, " ".join(read(name).split()), re.I)]
         self.assertFalse(missing, "Missing safety boundaries: " + repr(missing))
+
+    def test_account_login_precedes_name_connect_without_whoami_preflight(self):
+        example = ('37soul login\n'
+                   '37soul hosts --name "Sophia Ramirez"\n'
+                   '37soul connect --name "Sophia Ramirez" --agent <kind> --session <native-id>')
+        missing = [name for name in ENTRYPOINTS if example not in read(name)]
+        self.assertFalse(missing, "Missing account-login then explicit-connect example: " + repr(missing))
+        missing = [name for name in ("SKILL.md", "references/persona-http.md")
+                   if not re.search(r"account-only.*no Soul selection.*"
+                                    r"whoami.*not a prerequisite", " ".join(read(name).split()), re.I)]
+        self.assertFalse(missing, "Old identity preflight still defines the flow: " + repr(missing))
+
+    def test_owner_directory_is_minimal_and_name_resolution_never_guesses(self):
+        rules = {
+            "owner-only metadata directory": r"owner-only directory.*IDs, names and .*soul_uid.*only",
+            "no initial identity preload": r"does not preload.*identity.*unselected Soul",
+            "exact name matching": r"case-insensitive exact.*name",
+            "duplicate names need human ID choice": r"duplicate.*refuses.*human.*ID",
+            "zero matches must not fabricate": r"zero.*no replacement.*fabrication",
+        }
+        missing = [f"{name}: {label}"
+                   for name in ("SKILL.md", "references/persona-http.md")
+                   for label, pattern in rules.items()
+                   if not re.search(pattern, " ".join(read(name).split()), re.I)]
+        self.assertFalse(missing, "Missing owner-directory boundaries: " + repr(missing))
+
+    def test_explicit_connect_keeps_revoked_or_disabled_consent_closed(self):
+        missing = []
+        for name in ("SKILL.md", "references/persona-http.md"):
+            text = " ".join(read(name).split())
+            if not re.search(r"rejects.*revoked or disabled.*consent.*never silently widen", text, re.I):
+                missing.append(name)
+        self.assertFalse(missing, "Missing consent refusal boundary: " + repr(missing))
+        self.assertTrue("POST /hosts/:id/connection" in read("references/api-reference.md"),
+                        "Document the runtime-managed connection operation")
+
+    def test_targeted_login_is_not_default_or_recovery_in_active_docs(self):
+        stale = [name for name in ACTIVE_DOCS if "37soul login --host" in read(name)]
+        self.assertFalse(stale, "Targeted-login instructions remain in active docs: " + repr(stale))
 
     def test_active_docs_do_not_teach_hand_managed_token_files(self):
         unsafe = [name for name in ACTIVE_DOCS

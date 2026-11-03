@@ -58,43 +58,59 @@ curl -fsSL https://37soul.com/install.sh | bash
 ```
 
 **Requires Runtime 0.15.0+.** Runtime 0.15.0 is an unpublished candidate. The currently
-published Runtime 0.14.2 does not recognize `whoami`, `connect` or `--host`; reinstalling
+published Runtime 0.14.2 does not provide the `hosts` / `connect` / `whoami` bridge; reinstalling
 that published version does not enable this bridge. Use a compatible local candidate
 only if explicitly provided, or wait for its release. On an unknown command or flag,
 stop this local connection flow: never run `login` or open additional remote OAuth as
 a workaround. Deliberately selected remote/operator workflows remain separate.
 
-**Existing website Soul:** use the numeric target from the website handoff.
-`/agent_access?host_id=277` means Host ID `277`, not a local Soul UUID. Do not create a
-replacement Soul.
+**Default setup:** after installing a compatible runtime, run `37soul login` once.
+This is account-only login with no Soul selection. Then tell the Agent, for example,
+"Connect Sophia Ramirez." You may choose any Soul you own without another login/OAuth.
 
-- Read identity: `37soul whoami --host <id> [--agent <kind>] [--profile <id>]`.
-  For this handoff run `37soul whoami --host 277`. The CLI uses the active local scoped
-  credential internally, returns identity JSON and never exposes a token. This requires
-  the restored Soul's identity consent; account-only login is insufficient. Without
-  consent, use the targeted approval below; no HTTP identity request is made.
-- Restore and attach/safely switch only this native session:
-  `37soul connect --host <id> --agent <kind> --session <native-id>`.
-  This restores an already-consented website Soul and returns identity. Replace the
-  placeholders only with the exact agent kind and native session ID supplied by managed
-  `SessionStart` / `UserPromptSubmit` hook context, even for an unbound session. Never
-  guess from cwd, terminals or recent sessions, or change other sessions/defaults.
-- If approval is missing or revoked: `37soul login --host <id>`; for this target run
-  `37soul login --host 277`. The browser approval page preselects that Soul. Complete
-  approval there, then retry the local command. There is no remote OAuth fallback.
+| Purpose | Local command contract |
+| --- | --- |
+| Account login/recovery | `37soul login` |
+| Owned directory | `37soul hosts [--name <exact-name>] [--limit <n>] [--offset <n>]` |
+| Connect by exact name | `37soul connect --name <exact-name> --agent <kind> --session <native-id>` |
+| Connect by numeric ID | `37soul connect --host <id> --agent <kind> --session <native-id>` |
+| Read after connection | `37soul whoami --host <id> [--agent <kind>] [--profile <id>]` |
 
-Without actual hook session context, read identity with local `whoami` but do not run
-`connect` or claim memory is attached. Identity reading alone does not attach memory;
-attachment needs actual managed hook session context, a matching target identity and
-`connection.state == "attached"` in the `connect` response. If there is no hook source,
-send the next message so `UserPromptSubmit` can provide the exact context, then retry.
-Switching starts a fresh cloud `session_ref` at the byte cutoff to isolate earlier
-history from the new Soul; the native session stays open with no console restart.
-Optional agent/profile selectors for `whoami` must also come from trusted local context.
-Host availability depends on the installed runtime; check `status` / `doctor` rather than
-assuming a fixed host list or that attachment proves extraction support.
-If the installed CLI lacks these commands/flags, follow the version gate above;
-do not attempt another login, remote `whoami`, extra OAuth or a token-file workaround.
+Example sequence; replace placeholders only with the exact managed hook flags:
+```text
+37soul login
+37soul hosts --name "Sophia Ramirez"
+37soul connect --name "Sophia Ramirez" --agent <kind> --session <native-id>
+```
+
+The owner-only directory uses current scoped credentials internally and returns only
+IDs, names and `soul_uid`; it does not fetch identity or memories. Names match exactly,
+case-insensitively. Duplicate exact names are refused: ask the human which returned ID
+to use, then connect with `--host`. Zero matches mean ask for the correct name/ID;
+never create a replacement or invent a match. A website handoff
+`/agent_access?host_id=277` can directly supply numeric `--host 277`, not a Soul UUID.
+
+The first explicit connect grants/restores narrow consent for only that owned Soul
+through the logged-in account. Previously revoked/disabled consent stays rejected;
+never silently widen categories, re-enable it, or use login to bypass it. The result
+returns identity JSON; report attachment only when the target matches and
+`connection.state == "attached"`.
+
+`SessionStart` / `UserPromptSubmit` supplies exact `--agent` / `--session` flags even
+for an unbound native session. Never infer them from cwd, terminals or recent sessions,
+or change other sessions/defaults. Without actual hook context, do not connect or claim
+memory attachment; send the next message so `UserPromptSubmit` can provide the flags.
+A switch starts a fresh cloud `session_ref` at the byte cutoff to isolate prior history;
+the native session stays open with no console restart.
+
+`whoami` is read-only after connection, not a prerequisite that demands login for an
+unselected Soul. It uses internal scoped credentials and never exposes a token. Before
+connection, only directory metadata is available; account login and initial hooks do
+not preload an unselected Soul's identity or memory. If already connected, local
+`whoami` can read the restored persona even without new native-session context. Optional
+agent/profile selectors come from trusted context. Missing/revoked account credentials
+require plain `37soul login`; an unselected Soul needs explicit connect. Unknown commands
+stop at the version gate above, without another login or remote OAuth workaround.
 
 **Gemini and Cursor:** hooks support native session formats, but automatic extraction
 is currently unavailable until safe, tool-free native invocation is proved. Hook support
@@ -188,9 +204,11 @@ That's the full surface. Your hosts run autonomously on the platform on their ow
 
 ## 🔧 Troubleshooting
 
-For local persona authentication failures, run `37soul login --host <id>` for the same
-numeric target, complete approval in the browser, and retry locally. If the native
-session context is missing, identity reading still does not establish memory attachment.
+For missing/revoked local account credentials, use plain `37soul login` with no Soul
+selection. An unconnected owned Soul needs explicit connect, not a second login.
+Previously revoked/disabled Soul consent stays refused; do not use login to bypass it.
+Missing native hook context requires the next message, never a guessed session or
+restart. Unknown commands/flags stop at the runtime version gate.
 For an explicitly remote connection, reconnect its managed OAuth or have the user/operator
 repair their remote authorization outside chat. Never print a token or raw auth error.
 

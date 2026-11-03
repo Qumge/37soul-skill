@@ -2,12 +2,14 @@
 
 You act as the **creator** for the documented agent-safe subset of the account. Base URL: `https://37soul.com/api/v1/me`.
 
-This reference describes the remote API. With a local runtime installed, persona
-identity reads use `37soul whoami --host <id>` and session attachment uses the exact
-managed hook context through `37soul connect --host <id> --agent <kind> --session <native-id>`
-(see `SKILL.md`). Remote MCP/HTTP remains available for deliberately chosen remote
-workflows, remote-only apps and operator operations; it is not a fallback for local
-credential errors.
+This reference describes the remote API. Local persona requires Runtime 0.15.0+
+(0.15.0 is currently an unpublished candidate). Setup is plain `37soul login`
+(account-only, no Soul selection),
+then owner-directory `hosts` and explicit `connect --name` or `connect --host` with
+exact native hook flags. `whoami --host` is read-only after connection, not a
+prerequisite requiring a second login for an unselected owned Soul. See `SKILL.md`.
+Remote MCP/HTTP remains available for deliberately chosen remote workflows,
+remote-only apps and operator operations; it is not a fallback for local failures.
 
 Remote HTTP examples assume the user/operator has configured the token outside chat.
 Never read or write token files, print credentials, or request a pasted token or
@@ -21,6 +23,26 @@ Every remote HTTP request needs:
 The user/operator manages remote authorization outside the conversation on 37soul.com
 (**Connect an Agent → Other agents**); revoke it in **Settings → Connected agents**.
 An account API token can cover every owned Host; always name the intended Host ID.
+
+## Runtime-managed local connection (unpublished candidate)
+
+`37soul hosts [--name <exact-name>] [--limit <n>] [--offset <n>]` uses the current
+scoped account credentials internally. This owner-only directory contains IDs, names
+and `soul_uid` only; it does not fetch identity, memories or assets for initial loading.
+
+On the user's explicit `connect --name` or `connect --host`, the runtime performs the
+server's `POST /hosts/:id/connection` operation (route suffix shown). The existing
+logged-in account establishes/restores narrow consent only for that owned Soul.
+Previously revoked/disabled consent is rejected, never silently widened or re-enabled.
+Case-insensitive exact names must resolve uniquely; duplicates require the human's ID
+choice, and zero matches never create a replacement. This is a runtime-owned operation,
+not an instruction for the Agent to call HTTP or copy credentials. The CLI still needs
+exact `--agent` / `--session` hook flags and verifies `connection.state == "attached"`.
+
+`whoami --host` only reads an already connected/restored identity. Missing account
+credentials require plain `37soul login`; a valid account can connect another eligible
+owned Soul without another login/OAuth. Account login does not select or preload a
+Soul, and missing native session context never licenses guessing or restarting.
 
 ## Become your character (explicit remote persona mode)
 

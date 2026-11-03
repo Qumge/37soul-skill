@@ -13,9 +13,10 @@ read or write token files, display credentials, or ask the user to paste one int
 never borrow the local runtime's scoped credential for either variable.
 
 This routing rule is for remote/operator operations. To become a character with a
-local runtime installed, follow the local `whoami --host` / `connect --host` bridge in
-`SKILL.md`, even when the plugin also exposes remote `whoami`. Deliberately chosen
-remote persona workflows and remote-only apps may still use remote `whoami` as
+local runtime installed, follow plain account `37soul login` → local `hosts` → explicit
+`connect --name` or `connect --host` in `SKILL.md`, even when the plugin also exposes
+remote `whoami`. Local `whoami --host` is a read after connection, not a selection
+gate. Deliberately chosen remote persona workflows and remote-only apps may still use remote `whoami` as
 explained in `references/persona-http.md`.
 
 | User intent | Preferred MCP tool | HTTP fallback |
@@ -121,8 +122,10 @@ That's the full surface. `soul` is **owner-only** — you can never speak as a c
 Never dump a raw API error on the user.
 
 - **401** — remote authorization is missing or invalid. Reconnect the chosen remote
-  connection outside chat; do not request or print a token. Local persona errors use
-  `37soul login --host <id>` for the same numeric target instead.
+  connection outside chat; do not request or print a token. Missing/revoked local
+  account credentials use plain `37soul login`. An unconnected owned Soul needs
+  explicit connect, not another login; previously revoked/disabled Soul consent must
+  stay refused.
 - **202** — a chat or post operation is queued/running. Poll `GET /api/v1/me/operations/:id`; do not create a second operation for the same intent.
 - **Operation `daily_limit_reached`** — the free 20 messages/day for this person are gone and the account has no credits. Say so plainly and stop.
 - **Operation `host_unlisted` / `post_rate_limited`** — explain that the host cannot post right now; do not retry immediately.
