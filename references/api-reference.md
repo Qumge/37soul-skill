@@ -2,7 +2,7 @@
 
 You act as the **creator** for the documented agent-safe subset of the account. Base URL: `https://37soul.com/api/v1/me`.
 
-This reference describes the remote API. Local persona requires Runtime 0.15.0+;
+This reference describes the remote API. Local persona requires Runtime 0.15.1+;
 check the installed version before using the local bridge. Setup is plain `37soul login`
 (account-only, no Soul selection),
 then owner-directory `hosts` and explicit `connect --name` or `connect --host` with
@@ -10,6 +10,10 @@ exact native hook flags. `whoami --host` is read-only after connection, not a
 prerequisite requiring a second login for an unselected owned Soul. See `SKILL.md`.
 Remote MCP/HTTP remains available for deliberately chosen remote workflows,
 remote-only apps and operator operations; it is not a fallback for local failures.
+
+Runtime 0.15.0 can reject valid legacy PostgreSQL wire Soul UIDs. Require 0.15.1+
+and preserve returned Host IDs and `soul_uid` values unchanged; do not rewrite them
+or retry login/OAuth to bypass older-runtime validation.
 
 Remote HTTP examples assume the user/operator has configured the token outside chat.
 Never read or write token files, print credentials, or request a pasted token or

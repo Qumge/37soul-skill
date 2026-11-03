@@ -57,10 +57,13 @@ clawhub install 37soul-skill
 curl -fsSL https://37soul.com/install.sh | bash
 ```
 
-**要求 Runtime 0.15.0+。** 运行本地 `hosts` / `connect` / `whoami` 前，先确认已安装
-运行时报告的版本。0.14.2 不支持这个连接桥和 `--host` 目标参数；低于 0.15.0 时通过官方
+**要求 Runtime 0.15.1+。** 运行本地 `hosts` / `connect` / `whoami` 前，先确认已安装
+运行时报告的版本。0.14.2 不支持这个连接桥和 `--host` 目标参数；低于 0.15.1 时通过官方
 安装脚本更新，确认版本达标后再试。遇到未知命令或参数时停止本地连接流程，不得通过再次
 登录、额外远程 OAuth 或 token 文件绕过。明确选择的远程/operator 流程仍独立可用。
+
+0.15.0 可能拒绝有效的旧 PostgreSQL wire Soul UID。应升级到 0.15.1+，保持返回的 Host ID
+和 `soul_uid` 原样，不得改写这些标识符来绕过旧校验，也不要因此重复登录/OAuth。
 
 **默认流程：** 安装兼容运行时后，先运行一次 `37soul login`。这只是账号登录，
 不选择 Soul。然后告诉 Agent「连接 Sophia Ramirez」。账号有效时，可以选择任意自有 Soul，

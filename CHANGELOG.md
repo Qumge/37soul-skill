@@ -2,6 +2,16 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.13.1 - 2026-11-03
+
+- Require Runtime 0.15.1+ in all active local guides and upgrade conditions. Runtime
+  0.15.0 could reject valid legacy PostgreSQL wire Soul UIDs in an owned directory;
+  upgrade the runtime while preserving returned Host IDs and `soul_uid` unchanged.
+- Keep account-only login, exact name/alias pagination, consent refusals and native
+  session flags intact. UID validation failures never justify another OAuth flow.
+- Add an independent minimum-version regression covering active headings and upgrade
+  conditions; retain the existing 15 contracts and align release metadata to 6.13.1.
+
 ## 6.13.0 - 2026-11-03
 
 - Default local setup is install → plain account login, with no Soul selection.

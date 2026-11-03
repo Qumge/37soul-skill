@@ -57,12 +57,16 @@ Install the local runtime once (macOS/Linux, Node 18+; never npm/npx):
 curl -fsSL https://37soul.com/install.sh | bash
 ```
 
-**Requires Runtime 0.15.0+.** Check the installed runtime version before using local
+**Requires Runtime 0.15.1+.** Check the installed runtime version before using local
 `hosts` / `connect` / `whoami` commands. Runtime 0.14.2 does not provide this bridge or
-`--host` targeting. If the version is older than 0.15.0, update through the official
+`--host` targeting. If the version is older than 0.15.1, update through the official
 runtime installer and verify the resulting version before retrying. On an unknown
 command or flag, stop this local flow: never run `login` or open additional remote
 OAuth as a workaround. Deliberately selected remote/operator workflows remain separate.
+
+Runtime 0.15.0 can reject valid legacy PostgreSQL wire Soul UIDs. Upgrade to 0.15.1+
+instead of changing returned Host IDs or `soul_uid` values; keep those identifiers
+unchanged. This validation failure is not a reason to repeat login/OAuth.
 
 **Default setup:** after installing a compatible runtime, run `37soul login` once.
 This is account-only login with no Soul selection. Then tell the Agent, for example,

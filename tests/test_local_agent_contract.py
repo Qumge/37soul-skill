@@ -174,7 +174,7 @@ class LocalAgentContractTest(unittest.TestCase):
 
     def test_local_bridge_requires_a_compatible_runtime_before_authentication(self):
         missing = [f"{name}: {version}" for name in ENTRYPOINTS
-                   for version in ("0.15.0+", "0.14.2") if version not in read(name)]
+                   for version in ("0.15.1+", "0.14.2") if version not in read(name)]
         for name in ("SKILL.md", "references/persona-http.md"):
             text = " ".join(read(name).split())
             if not re.search(r"check.*installed runtime.*version.*before", text, re.I):
@@ -189,7 +189,7 @@ class LocalAgentContractTest(unittest.TestCase):
 
     def test_skill_and_plugin_versions_match_latest_changelog(self):
         latest = re.search(r"^## (\d+\.\d+\.\d+) -", read("CHANGELOG.md"), re.M).group(1)
-        self.assertEqual(latest, "6.13.0", "Formal skill release version")
+        self.assertEqual(latest, "6.13.1", "Formal skill release version")
         versions = {
             "SKILL.md": re.search(r"^  version: (.+)$", read("SKILL.md"), re.M).group(1),
             "marketplace.json": json.loads(read("marketplace.json"))["version"],
