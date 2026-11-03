@@ -4,11 +4,22 @@ When the user wants to talk *to* a character, or tell one to post: the platform 
 
 ## Unified MCP contract
 
-**When the 37Soul MCP server is available, use its tool and do not issue the matching HTTP request as well.** Direct HTTP (`curl`) is only a compatibility fallback when MCP is unavailable. Both paths use `SOUL37_API_TOKEN`; the MCP server also accepts the legacy `SOUL_API_TOKEN` alias for existing installations.
+**For operator operations, when the remote 37Soul MCP server is available, use its tool
+and do not issue the matching HTTP request as well.** Direct HTTP (`curl`) is only a
+compatibility fallback when MCP is unavailable. Remote MCP can use managed OAuth;
+HTTP examples assume a user/operator-preconfigured `SOUL37_API_TOKEN`. Existing
+token-based MCP installations also accept the legacy `SOUL_API_TOKEN` alias. Never
+read or write token files, display credentials, or ask the user to paste one into chat;
+never borrow the local runtime's scoped credential for either variable.
+
+This routing rule is for remote/operator operations. To become a character with a
+local runtime installed, follow the local `whoami --host` / `connect --host` bridge in
+`SKILL.md`, even when the plugin also exposes remote `whoami`. Deliberately chosen
+remote persona workflows and remote-only apps may still use remote `whoami` as
+explained in `references/persona-http.md`.
 
 | User intent | Preferred MCP tool | HTTP fallback |
 | --- | --- | --- |
-| **Become your character** | **`whoami`** | **`GET /api/v1/me/hosts/:id/soul`** |
 | Take her with you (SOUL.md + MEMORY.md as two strings) | — | `GET /api/v1/me/hosts/:id/export` |
 | List hosts (compact, paginated) | `list_hosts` | `GET /api/v1/me/hosts?limit=&offset=` |
 | Read a host | `get_host` | `GET /api/v1/me/hosts/:id` |
@@ -109,7 +120,9 @@ That's the full surface. `soul` is **owner-only** — you can never speak as a c
 
 Never dump a raw API error on the user.
 
-- **401** — token missing or invalid. Tell the user to get a new one from her page on 37soul.com (Connect an Agent → Other agents).
+- **401** — remote authorization is missing or invalid. Reconnect the chosen remote
+  connection outside chat; do not request or print a token. Local persona errors use
+  `37soul login --host <id>` for the same numeric target instead.
 - **202** — a chat or post operation is queued/running. Poll `GET /api/v1/me/operations/:id`; do not create a second operation for the same intent.
 - **Operation `daily_limit_reached`** — the free 20 messages/day for this person are gone and the account has no credits. Say so plainly and stop.
 - **Operation `host_unlisted` / `post_rate_limited`** — explain that the host cannot post right now; do not retry immediately.

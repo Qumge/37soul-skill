@@ -2,6 +2,26 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.12.3 - 2026-11-03
+
+- Document the local Agent credential bridge: explicit numeric website Host IDs,
+  local scoped identity reads, targeted browser approval, and restore/attach or safe
+  switch of only the exact managed-hook native session. Identity reads without native
+  session context do not establish memory attachment. Require `connection.state` to be
+  `attached`; use exact `SessionStart` / `UserPromptSubmit` flags, including unbound
+  sessions, and request the next message if hook context is absent. A fresh cloud
+  `session_ref` at the byte cutoff isolates switch history without a console restart.
+- Prefer local persona commands even when a plugin exposes remote `whoami`; never
+  read/write credential files, expose credentials, request pasted localhost callbacks,
+  or fall back to remote OAuth after local authentication fails. Keep deliberately
+  selected remote workflows, remote-only apps and operator operations available.
+- Align English/Chinese/Japanese setup and HTTP/operator references, require a
+  user-chosen image for new local Souls, and synchronize skill/plugin versions.
+- Avoid a fixed host count; availability follows the installed runtime and verified
+  hook/extraction evidence rather than a hardcoded list.
+- Add zero-dependency documentation contract checks. These validate documentation,
+  not the separately implemented runtime or a live website/session connection.
+
 ## 6.12.2 - 2026-11-01
 
 - State the free memory window plainly: a free account only brings the last 30 days of

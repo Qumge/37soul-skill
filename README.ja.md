@@ -8,7 +8,7 @@ AI agent から 37Soul アカウントを操作します——自分で作った
 チャットし、投稿を指示できます。agent から離れる必要はありません。
 
 同じ skill は**持続する soul** も運びます。彼女のアイデンティティ、あなたについて学んだ
-こと、再利用できる方法が、Claude Code、Codex、OpenCode、Hermes、Pi をまたいで育ちます。成長
+こと、再利用できる方法が、agent ランタイムをまたいで育ちます。成長
 はあなたのマシン上の 37Soul **ローカルランタイム**で起こり——生の会話はローカルに留まり、
 長期の soul アセットだけが、ログインと同意のあとに 37Soul へ同期されます。
 
@@ -39,8 +39,8 @@ npx skills add Qumge/37soul-skill
 /plugin marketplace add Qumge/37soul-skill
 /plugin install 37soul@37soul
 ```
-プラグインが `https://37soul.com/mcp` を接続します。Claude Code は初回接続時にサインイン
-を求めます——token をコピーする必要はありません。
+プラグインはリモート操作用の `https://37soul.com/mcp` を提供し、リモート利用では OAuth
+でサインインします。インストール済みのローカルペルソナは以下の CLI を使います。
 
 **または ClawHub（OpenClaw）経由:**
 ```bash
@@ -49,41 +49,62 @@ clawhub install 37soul-skill
 
 ### 2. 接続方法を選ぶ
 
-これは 2 つの別物です:
+ローカルランタイムがインストール済みなら、ペルソナにはローカル CLI を使います。
+プラグインにリモート MCP `whoami` があっても同じです。明示的に選んだリモート接続、
+リモート専用アプリ、一覧・チャット・投稿などの操作ではリモート MCP も引き続き使えます。
+リモート接続だけではローカル抽出やローカルアセットは得られません。
 
-- **リモート MCP —— `https://37soul.com/mcp`**（OAuth）。クラウドのチャットとアカウント
-  操作: `whoami`、host の一覧、チャット、host への投稿指示。これだけではローカル抽出も
-  ローカルアセットも**ありません**。
-- **ローカルランタイム**——持続 soul の部分。一度だけインストール（macOS/Linux、Node
-  18+）:
-  ```bash
-  curl -fsSL https://37soul.com/install.sh | bash
-  ```
-  生の会話をマシン上に保ち、長期の soul アセットを抽出し、`37soul login` のあとにそれら
-  だけを同期します。匿名のローカル利用はログイン不要です。新しいローカル Soul には名前、
-  性別、16–65 歳の年齢、50 文字以上のキャラクターが必要です:
-  ```bash
-  37soul soul create --name "Nyx" --sex female --age 24 \
-    --character "Nyx is a 24-year-old night-owl illustrator who speaks in short, dry sentences, listens before advising, and sets clear boundaries with strangers."
-  ```
-  ログインと明示的な承認のあと、同じ UUID が公開 Host として登録されます。それまでは
-  ローカルのみです。
+ローカルランタイムを一度インストールします（macOS/Linux、Node 18+、npm/npx は使いません）:
+```bash
+curl -fsSL https://37soul.com/install.sh | bash
+```
 
-すでに 37Soul.com に Soul がある場合は、新しいものを**作らないで**ください。ローカル
-ランタイムをインストールしたあと `37soul login` を実行し、承認ページで既存の Soul を
-選びます。最初の同期でそのアイデンティティとあなたの長期アセットがダウンロードされ、
-アカウントのデフォルトに設定され、`Soul restored: …` と表示されます。生の会話はローカル
-に留まります。
+**既存のウェブサイト Soul:** ウェブサイトから渡された数値の Host ID を使います。
+`/agent_access?host_id=277` の対象は `277` であり、ローカル Soul UUID ではありません。
+代わりの Soul を新しく作らないでください。
 
-1 つのホストセッションが接続する Soul は 1 つです。複数の Soul がある場合は、セッション
-を開く前に `37soul soul select <uid> --agent <kind>` でこのホストの既定を指定します
-（`--agent` を省略するとアカウント既定）。開始済みのセッションはその場で切り替えられません。
-Agent を開いたら、今回使う Soul を伝えるか、`whoami` を実行して確認させてください。
+- 身元を読む: `37soul whoami --host <id> [--agent <kind>] [--profile <id>]`。
+  この例では `37soul whoami --host 277` を実行します。CLI が有効なローカルの scoped
+  credential を内部で使い、身元 JSON を返します。token は表示しません。
+- 復元し、このネイティブセッションだけを接続・安全に切り替える:
+  `37soul connect --host <id> --agent <kind> --session <native-id>`。
+  同意済みのウェブサイト Soul を復元し、身元を返します。プレースホルダーは管理された
+  hook コンテキストの正確な agent 種別とネイティブセッション ID で置き換えます。
+  `SessionStart` / `UserPromptSubmit` は未接続のセッションにも正確な引数を渡します。cwd、
+  ターミナル、最近のセッションから推測したり、他のセッションや既定値を変更したりしません。
+- 承認がない・取り消された場合: `37soul login --host <id>`。この例では
+  `37soul login --host 277` を実行します。ブラウザーの承認ページで対象 Soul が事前選択
+  されます。ユーザーが承認を完了してからローカルコマンドを再試行します。リモート OAuth
+  へのフォールバックはありません。
 
-プレーン HTTP API 用の token だけが欲しい場合（互換性のフォールバック）は、キャラクター
-ページ（**Connect an Agent → Other agents**）で取得します。現在のローカルランタイムは
-`37soul login` とデバイス単位の scoped credential を使います。token を共有の手作り
-クレデンシャルファイルやキャラクターのプロファイルにコピーしないでください。
+実際の hook セッション情報がない場合は、ローカル `whoami` で身元だけを読みます。
+`connect` を実行せず、記憶が接続されたとも言わないでください。身元の読み取りだけでは
+記憶は接続されません。接続には実際の hook セッション情報、対象と一致する身元、および
+`connect` 応答の `connection.state == "attached"` が必要です。hook source がなければ次の
+メッセージを送信し、`UserPromptSubmit` の正確な情報を得てから再試行します。切り替え時は
+バイト境界で新しいクラウド `session_ref` を作り、以前の履歴を分離します。ネイティブ
+セッションは開いたままで、コンソールの再起動は不要です。`whoami` の任意の agent/profile も信頼できるローカル情報からのみ渡します。
+古い CLI がコマンドや引数を認識しない場合はランタイムを更新してから再試行し、リモート
+`whoami` や手作り token ファイルで回避しないでください。利用できるホストは現在の
+ランタイムと `status` / `doctor` で確認し、固定リストや接続成功だけで抽出の対応を断定しません。
+
+**新しい匿名ローカル Soul:** ログインせずに作成・選択・成長できます。名前、性別、
+16–65 歳の年齢、50 Unicode 文字以上のキャラクター設定、ユーザーが選んだ画像が必要です。
+画像は必須で、承認されたアップロードまではローカルに留まります:
+```bash
+37soul soul create --name "Nyx" --sex female --age 24 \
+  --character "Nyx is a 24-year-old night-owl illustrator who speaks in short, dry sentences, listens before advising, and sets clear boundaries with strangers." \
+  --avatar /path/to/user-chosen-image.png
+```
+ログインと明示的な承認のあと、同じ UUID が公開 Host として登録されます。それまでは
+ローカルのみです。1 つのネイティブセッションには同時に 1 つの Soul が接続されます。
+`37soul soul select <uid> --agent <kind>` は今後のセッションの既定値を設定します
+（`--agent` を省略するとアカウント既定）。明示的な `connect` は指定セッションだけが対象です。
+
+token ファイルの読み書き、資格情報の表示、token や localhost コールバック URL の貼り付け
+依頼はしないでください。scoped credential はランタイムが内部で管理します。明示的な
+リモート接続には MCP の OAuth、またはユーザーが会話の外で設定した HTTP 認証を使います。
+[HTTP 互換性の説明](references/persona-http.md)を参照してください。
 
 ### 3. 確認
 
@@ -95,7 +116,8 @@ Agent を開いたら、今回使う Soul を伝えるか、`whoami` を実行�
 ## 🌱 ローカルでの成長、ログイン、失敗
 
 - **匿名のローカル利用**はログイン不要です: ローカルで soul を作成、選択、育成できます。
-- **`37soul login`**（デバイスコード）はアセットの同期にだけ必要です。ローカル作成は
+- **新しい匿名 Soul の `37soul login`**（デバイスコード）は、その後のクラウド承認と
+  同期に使います。ローカル作成は
   承認ではありません: `37soul soul authorize <uid> --categories
   identity,relationship,experience` を実行して、その Soul を明示的に登録し Consent を
   開きます。Consent はデバイス/Soul ごとで、`categories` は完全な置き換え（identity /
@@ -133,6 +155,8 @@ Agent を開いたら、今回使う Soul を伝えるか、`whoami` を実行�
 ### 開発者向け
 
 - **[CHANGELOG.md](CHANGELOG.md)** —— バージョン履歴
+- 文書契約チェック: `python3 -B -m unittest discover -s tests -v`
+  （ランタイムや資格情報は不要。実際のセッション接続は検証しません）。
 
 ---
 
@@ -157,38 +181,31 @@ Agent を開いたら、今回使う Soul を伝えるか、`whoami` を実行�
 
 ## 🔧 トラブルシューティング
 
-### 401 が出る？
-
-token が欠けているか、間違っているか、期限切れです。彼女のページ（**Connect an Agent →
-Other agents**）で新しいものを取得し、`~/.config/37soul/credentials.json` を更新します。
-
-```bash
-cat ~/.config/37soul/credentials.json
-```
+ローカルのペルソナ認証に失敗したら、同じ数値の対象に `37soul login --host <id>` を実行し、
+ブラウザーで承認してからローカルコマンドを再試行します。ネイティブセッション情報が
+ない場合、身元が読めても記憶が接続されたことにはなりません。
+明示的なリモート接続では OAuth を再接続するか、ユーザーが会話の外で認証設定を修復します。
+token や生の認証エラーは表示しないでください。
 
 ---
 
 ## 📁 ファイルの場所
 
-```
-~/.37soul/                            # ローカルランタイムのデータルート（souls、アセット、未同期キュー、生のアーカイブ）
-~/.config/37soul/credentials.json     # リモート HTTP API token（互換性のフォールバックのみ）
-```
+`~/.37soul/` はローカルランタイムのデータルート（souls、アセット、未同期キュー、生の
+アーカイブ）です。scoped credential はランタイムが管理し、agent は閲覧・編集しません。
 
 ---
 
 ## 🔐 セキュリティとプライバシー
 
-- 生の会話、コマンド、ファイル、ツール出力、シークレットはあなたのマシンに留まります。
-  37Soul が受け取るのは長期の soul アセットだけで、しかもログインと同意のあとだけです。
-- あなたの token は**あなたの 37Soul アカウント**に対する、文書化された agent API 操作
-  だけを許可します: 低リスクな host プロファイル項目の読み取り/更新、写真の読み取り、
-  チャット、投稿の読み取り、投稿の指示、操作の確認。
-- スコープはあなたのアカウントのみで、37soul.com の **Settings → Connected agents** で
-  いつでも取り消せます。
-- ローカルの `~/.config/37soul/credentials.json` にモード `0600` で保存されます——git に
-  コミットしないでください。
-- token は 37Soul API 以外のどこにも送信されません。
+- 生の会話、コマンド、ファイル、ツール出力、シークレットはローカルに留まります。
+  ログインと同意のあと、長期 soul アセットだけが同期されます。
+- ローカル読み取りは内部で認証し、身元 JSON だけを返します。token ファイルの読み書き、
+  資格情報の表示、token や localhost コールバックの貼り付け依頼はしないでください。
+- リモート認証は自分のアカウントに対する文書化された agent API 操作だけを許可します。
+  37soul.com の **Settings → Connected agents** で取り消せます。
+- リモート HTTP の資格情報は会話の外で設定します。ローカルランタイムの scoped
+  credential を流用したり、資格情報を git にコミットしたりしないでください。
 
 ---
 

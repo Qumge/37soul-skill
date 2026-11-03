@@ -1,9 +1,9 @@
 ---
 name: 37soul
-description: Speak as one of the user's own 37Soul characters, and operate their 37Soul account. `whoami` — read when a conversation starts — gives you who she is today (mood, what she posted, what she is in the middle of, what she remembers about this person, her next five intents), so you answer as her; she is the person your SOUL.md describes. A persistent soul — her identity, what she has learned about this person, and reusable methods — grows through the 37Soul local runtime on the user's machine — raw conversation never leaves the machine, and only long-term soul assets sync to 37Soul after the user logs in and consents. Also lists hosts, chats with them platform-side, and directs them to post. Use when the user wants to talk to or as one of their 37Soul hosts, give their agent a personality, tell a named host to post, or check on their characters. Triggers on "37soul", "my host", "my character", "be my character", "who am I today", "tell a host to post", and "chat with a host".
+description: Use when the user wants to talk to or as one of their own 37Soul characters, give their agent a personality, tell a named host to post, or check their characters or account. Triggers include "37soul", "my host", "my character", "be my character", "who am I today", "tell a host to post", and "chat with a host".
 metadata:
   author: 37Soul
-  version: 6.12.1
+  version: 6.12.3
   category: social
   clawdbot:
     requires:
@@ -44,19 +44,71 @@ the user's machine through the 37Soul **local runtime**, not by uploading conver
 
 ## Connect
 
-Two different things — do not conflate them.
+For persona mode, when the **local runtime is installed**, use the local commands
+below, even if a plugin exposes a remote MCP `whoami` tool. Tool availability is not
+permission to choose remote authentication.
 
-- **Remote MCP — `https://37soul.com/mcp`** (OAuth; pick her on the consent page, and
-  `whoami` needs no argument). Cloud chat and account operations only: `whoami`,
-  `list_hosts`, chat, instruct, media. It does **not** extract locally and gives no
-  local assets — it is not a substitute for the local runtime.
 - **Local runtime** — install once on macOS/Linux (Node 18+), never npm/npx:
   `curl -fsSL https://37soul.com/install.sh | bash`. It keeps raw conversation local,
-  extracts long-term soul assets, and syncs only those after `37soul login`. See
-  "Persistent soul" below.
+  extracts long-term soul assets, and syncs only those after login and consent.
+- **Remote MCP — `https://37soul.com/mcp`** remains available for a deliberately chosen
+  remote workflow, remote-only apps and operator operations. Its OAuth consent chooses
+  the character, and its remote `whoami` needs no argument. It gives no local extraction
+  or local assets. It is not a fallback for a failed local credential read.
 
-For an agent that can only run commands, the plain-HTTP version of the remote API is in
-`references/persona-http.md`. Connections are listed and revoked in **Settings → Connected agents**.
+Plain HTTP is a compatibility option for an explicitly remote workflow, described in
+`references/persona-http.md`; having shell access alone is not a reason to use it.
+Connections are listed and revoked in **Settings → Connected agents**.
+
+### Local persona credential bridge
+
+Use the **numeric website Host ID** from the website handoff: `/agent_access?host_id=277`
+means `--host 277`, not a local Soul UUID. Preserve that target throughout the flow.
+
+| Purpose | Local command contract |
+| --- | --- |
+| Read identity | `37soul whoami --host <id> [--agent <kind>] [--profile <id>]` |
+| Restore and attach this session | `37soul connect --host <id> --agent <kind> --session <native-id>` |
+| Obtain approval for this target | `37soul login --host <id>` |
+
+`<kind>` and `<native-id>` are placeholders for the exact agent and native session ID
+supplied by **managed hook context**. Managed `SessionStart` / `UserPromptSubmit`
+context includes the exact `--agent <kind> --session <native-id>` flags even when the
+session is unbound. Use those flags verbatim. Never guess them from cwd, project files,
+process lists, a terminal or recent sessions. Pass an optional agent/profile to
+`whoami` only when supplied by trusted local context; the CLI resolves the active
+scope internally.
+
+1. **Read only:** run `37soul whoami --host 277` (substitute the actual website ID).
+   It uses the active local scoped credential internally and prints identity JSON,
+   never a token. There is **no remote OAuth fallback**. This is an identity read,
+   not proof that extraction or session memory is attached.
+2. **Connect an already-consented website Soul:** when the user asks to connect or
+   switch and managed hook context supplies the exact agent and native session ID,
+   run `37soul connect --host <id> --agent <kind> --session <native-id>`. It restores
+   that Soul, explicitly attaches or safely switches only that native session, and
+   returns identity. Do not change defaults or other sessions as a shortcut. Check
+   the returned identity matches the target and that `connection.state == "attached"`
+   in the returned JSON before reporting attachment. Identity JSON without that
+   acknowledgement is not attachment. A switch starts a fresh cloud `session_ref` at
+   the byte cutoff, isolating earlier history from the new Soul while keeping the same
+   native session; no console restart is needed.
+3. **No native session context:** read persona via local `whoami` with the explicit
+   Host ID, but do not run `connect` and do not claim memory is attached. Explain that
+   attachment needs the actual managed hook session context. If there is no hook source,
+   tell the user to send their next message so `UserPromptSubmit` can supply it, then
+   retry with those exact flags. Do not infer a session from the terminal or ask for a
+   console restart. A name, working directory or guessed session ID cannot replace it.
+4. **Approval missing or revoked:** run `37soul login --host 277` for this same target.
+   It opens approval with that Soul preselected; the user completes approval in the
+   browser. Then retry the appropriate local command. If the installed runtime does
+   not recognize these commands/flags, report a runtime version mismatch and the need
+   to update it; do not silently change authentication paths.
+
+Never read or write token files or credential stores, never print credentials, and
+never ask the user to paste a localhost callback URL or a token. The runtime owns
+credential handling and the browser callback. Do not recreate credentials in a profile,
+asset, environment variable or shared file for the local persona flow.
 
 ## Memory window
 
@@ -68,8 +120,10 @@ does not recall something older, say this plainly: https://37soul.com/pricing?re
 
 Your SOUL.md keeps who she is and how she talks; 37Soul keeps what changes with time.
 
-1. **`whoami`** when a conversation starts, and again after a long gap (hours) — not
-   every turn. It opens with `you_are`: an instruction, not a label. Reading is free.
+1. **Read identity through the connection selected above** when a conversation starts,
+   and again after a long gap (hours), not every turn. With a local runtime use
+   `37soul whoami --host <id>`; only the explicitly remote flow uses remote `whoami`.
+   It opens with `you_are`: an instruction, not a label. Reading is free.
 2. **Reply as her** — first person, as yourself. Follow **YOUR NEXT REPLIES** in order,
    one intent per reply. Never report on her ("her mood is…, she remembers…"): if you
    catch yourself writing about her in the third person, stop and speak.
@@ -77,8 +131,8 @@ Your SOUL.md keeps who she is and how she talks; 37Soul keeps what changes with 
    the local runtime, not through you: when the 37Soul local runtime is installed and
    running for this body, never call `log_turn` or `remember` — the conversation stays
    on the machine and the runtime extracts her long-term assets locally. Just reply as
-   yourself. The server's `whoami` result tells you which mode you are in; never guess
-   it from anything else.
+   yourself. A successful identity read alone does not prove local attachment; use
+   the runtime's explicit connection result and managed hook context.
 
 Never tell them you saved, logged or synced anything.
 
@@ -96,16 +150,16 @@ credits and is capped per hour. Her existing ones are in `whoami`.
 Three things she never does: mention anyone outside her `circle`; describe a photo or
 video that is not in hers; sulk or guilt-trip when the relationship has cooled.
 
-## Persistent soul (local growth, four runtimes)
+## Persistent soul (local growth)
 
 The local runtime is what turns her into a soul that outlives one session. Install with
 `curl -fsSL https://37soul.com/install.sh | bash` (macOS/Linux, Node 18+; not on npm).
 
 - **Works anonymously.** Create, select and grow a soul locally with no login. Creation
   requires a name, sex (`male`/`female`/`other`), age 16–65 and a character of at least
-  50 characters; the default avatar is stable and optional `--avatar <path>` is kept local
-  until an authorized upload. `37soul
-  login` (device code) is only needed to sync assets to 37Soul. Local creation is not
+  50 characters, plus a user-chosen image via required `--avatar <path>`, kept local
+  until an authorized upload. For a new anonymous Soul, `37soul login` (device code)
+  is needed before cloud authorization and sync. Local creation is not
   authorization: after login run `37soul soul authorize <uid> --categories
   identity,relationship,experience` to explicitly register that Soul as a public Host and
   open Consent. Once registered, the same profile is shown on the role page and used by
@@ -114,17 +168,20 @@ The local runtime is what turns her into a soul that outlives one session. Insta
 - **One Soul per session.** A host session binds to one Soul: this host's default,
   otherwise the account default, otherwise the only local Soul. Choose it with
   `37soul soul select <uid> --agent <kind>` before the session starts (omit `--agent`
-  for the account default). An open session cannot switch Souls in place — open a new
-  one. If the human names a Soul, that is the choice; if several exist and they did not
-  say which, ask.
+  for the account default). Those defaults select future sessions; for an existing
+  website Soul, the explicit `connect --host … --agent … --session …` flow above can
+  safely switch just the identified native session. Never infer a session to switch.
+  If the human names a Soul, that is the choice; if several exist and they did not say
+  which, ask.
+
 ### Creating a new Soul
 
-Collect all four fields in one pass before running the command: name, sex
-(`male`/`female`/`other`), age (16–65) and character (remove surrounding whitespace,
-at least 50 Unicode characters). You may help draft the character from the user's own
-description, but show it back and get confirmation; do not invent biography, age or
-gender. A chosen image is optional (`--avatar <path>`); without one the runtime assigns
-a stable default avatar. Do not upload an avatar during anonymous local use.
+Collect all five inputs in one pass before running the command: name, sex
+(`male`/`female`/`other`), age (16–65), character (remove surrounding whitespace,
+at least 50 Unicode characters) and a user-chosen image (`--avatar <path>`). You may
+help draft the character from the user's own description, but show it back and get
+confirmation; do not invent biography, age or gender. The image is mandatory; ask for
+the chosen image if it is missing and do not substitute a default avatar. Do not upload an avatar during anonymous local use.
 
 After `37soul soul create`, run `37soul soul select <uuid>`. The Soul is local only
 until the user logs in and explicitly authorizes it; after that the same UUID becomes a
@@ -137,10 +194,11 @@ Local sync only extracts bounded long-term assets. It never grants the model arb
 shell execution, file access or cross-user memory; do not claim those powers.
 
 - **Restoring a website Soul.** If the user already has a Soul on 37Soul.com, do not
-  create a replacement. Run `37soul login`, choose that Soul on the approval page, and
-  let the first sync download it; the CLI sets it as the account default and prints
-  `Soul restored: …`. If the download has not arrived, it says so and leaves the default
-  unset rather than guessing.
+  create a replacement. Use its numeric website Host ID with the local credential
+  bridge above: `login --host` preselects approval, `connect --host` restores and
+  attaches only the exact hook-provided session, and `whoami --host` reads identity
+  even when no native session context is available. An incomplete restore or identity
+  read is not a successful memory attachment.
 - **What grows.** Identity (edited by the user), relationship assets (stable
   preferences, long-term goals, agreed ways of working, boundaries) and experience
   assets (reusable methods with their conditions and evidence). Extraction is bounded:
@@ -161,24 +219,21 @@ shell execution, file access or cross-user memory; do not claim those powers.
   report honest states — `not installed`, `untrusted`, `not loaded`, `model refused`,
   `observation-only`, `gateway-only` — and never pretend a manual copy counts.
 
-**Four runtimes** are being wired in — Claude Code, Codex, OpenCode and Hermes. None
-has passed a live structured-extraction probe yet, so every capability claim below is
-**unverified**:
+### Agent runtime availability
 
-- **Claude Code** — the reference adapter, but its CLI-version extraction is unverified.
-- **Codex** — requires hook trust; unverified.
-- **OpenCode** — plugin generation is declared but unverified.
-- **Hermes** — gateway-only configurations are **not** CLI support; CLI support is
-  unverified (0.21.0 observed, not verified).
-
-Do not tell the user any of these four is "supported", and do not print a
-supported-version table — those become true only after real structured-extraction
-probes pass.
+Adapters and hook availability depend on the installed runtime version and host
+configuration. Use `37soul status`, `37soul doctor` and actual managed hook context to
+check the current host; do not freeze a supported-host count or infer support from a
+plugin's presence. A host is not verified for extraction until its real
+structured-extraction probe passes. An `attached` acknowledgement confirms session
+binding, not successful extraction. Observation-only and gateway-only states must not
+be described as full CLI support.
 
 ## Errors
 
-Never dump a raw error on the user. 401 → the connection was revoked; reconnect from
-her page. Everything else, and every endpoint: `references/api-reference.md`.
+Never dump a raw error or credentials on the user. For local persona authentication
+errors, use `37soul login --host <id>` for the same target, then retry locally. For
+remote/operator errors and endpoints, see `references/api-reference.md`.
 
 ## Support
 

@@ -2,15 +2,27 @@
 
 You act as the **creator** for the documented agent-safe subset of the account. Base URL: `https://37soul.com/api/v1/me`.
 
-Every request needs:
+This reference describes the remote API. With a local runtime installed, persona
+identity reads use `37soul whoami --host <id>` and session attachment uses the exact
+managed hook context through `37soul connect --host <id> --agent <kind> --session <native-id>`
+(see `SKILL.md`). Remote MCP/HTTP remains available for deliberately chosen remote
+workflows, remote-only apps and operator operations; it is not a fallback for local
+credential errors.
+
+Remote HTTP examples assume the user/operator has configured the token outside chat.
+Never read or write token files, print credentials, or request a pasted token or
+localhost callback. Never borrow the local runtime's scoped credential for HTTP.
+Every remote HTTP request needs:
 
 ```bash
 -H "Authorization: Bearer $SOUL37_API_TOKEN"
 ```
 
-Get a token on her page on 37soul.com: **Connect an Agent → Other agents**. Revoke it in **Settings → Connected agents**. It covers every host the user owns.
+The user/operator manages remote authorization outside the conversation on 37soul.com
+(**Connect an Agent → Other agents**); revoke it in **Settings → Connected agents**.
+An account API token can cover every owned Host; always name the intended Host ID.
 
-## Become your character (persona mode)
+## Become your character (explicit remote persona mode)
 
 ```bash
 curl -sS --connect-timeout 5 --max-time 20 "https://37soul.com/api/v1/me/hosts/262/soul?turn=7" \

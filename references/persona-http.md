@@ -1,34 +1,68 @@
-# Persona mode over plain HTTP (no MCP)
+# Persona identity: local CLI first, explicit remote HTTP compatibility
 
-The same loop as SKILL.md, for an agent that can only run commands.
+When the local runtime is installed, persona mode uses local commands, even if a
+plugin exposes a remote MCP `whoami` tool. A command-capable agent does not need to
+manage a token or open remote OAuth to read its persona.
 
-## Token
+## Local credential bridge
 
-1. Get a token: on her page on 37soul.com click **Connect an Agent → Other agents**; the block it gives you carries the token.
-2. Save it to `~/.config/37soul/credentials.json` with owner-only permissions:
-   ```bash
-   install -d -m 700 ~/.config/37soul
-   umask 077
-   ```
-   ```json
-   { "api_token": "your_token_here" }
-   ```
-   After saving, run `chmod 600 ~/.config/37soul/credentials.json`.
-3. Load it in bash:
-   ```bash
-   SOUL37_API_TOKEN=$(cat ~/.config/37soul/credentials.json | grep -o '"api_token"[[:space:]]*:[[:space:]]*"[^"]*"' | cut -d'"' -f4)
-   ```
-4. Verify the token and discover the user's hosts:
-   ```bash
-   curl -sS --connect-timeout 5 --max-time 20 https://37soul.com/api/v1/me/hosts \
-     -H "Authorization: Bearer $SOUL37_API_TOKEN"
-   ```
-   One token covers **every** host the user owns — there's no per-host connection step
-   on this API: every call names its host in the path. (A token can *also* carry a
-   bound character, but that binding is read by the MCP tools, not by these
-   `/api/v1/me/*` calls — here you always pass the id.)
+The website handoff `/agent_access?host_id=277` supplies the numeric Host ID: use
+`--host 277`, not a local Soul UUID.
 
-## Reading her
+| Purpose | Local command contract |
+| --- | --- |
+| Read identity | `37soul whoami --host <id> [--agent <kind>] [--profile <id>]` |
+| Restore and attach this session | `37soul connect --host <id> --agent <kind> --session <native-id>` |
+| Targeted approval | `37soul login --host <id>` |
+
+`37soul whoami --host 277` uses the active local scoped credential internally and
+prints identity JSON, never a token. There is **no remote OAuth fallback**. Optional
+agent/profile selectors come only from trusted local context, not from credential
+files. Identity reading alone does not bind a session.
+
+To connect an already-consented website Soul, use `connect` only with the exact agent
+kind and native session ID supplied by managed hook context. Managed `SessionStart` /
+`UserPromptSubmit` context supplies the exact `--agent <kind> --session <native-id>`
+flags even when the session is unbound; use them verbatim. It restores the target,
+explicitly attaches or safely switches only that native session, and returns identity.
+Never guess the agent/session from cwd, project files, process lists or recent sessions,
+and do not change defaults or other sessions as a workaround. Confirm the returned
+identity matches the target and `connection.state == "attached"` in the returned JSON
+before claiming attachment. Identity JSON alone is insufficient. Switching starts a
+fresh cloud `session_ref` at the byte cutoff, isolating prior history from the new Soul
+while retaining the same native session; no console restart is needed.
+
+If no native session context is available, read persona via local `whoami --host <id>`;
+do not call `connect` and do not claim memory is attached. Explain that attachment
+requires actual managed hook session context. If there is no hook source, tell the user
+to send their next message so `UserPromptSubmit` can supply it, then retry with the exact
+flags. Never infer a native session from the terminal or ask for a console restart.
+If approval is missing or revoked, use
+`37soul login --host 277`: the approval page preselects this target. The user completes
+it in the browser; then retry the local command. An unrecognized command/flag means the
+installed runtime needs updating, not that remote authentication should be used.
+
+Never read or write token files or credential stores, never print credentials, and
+never ask the user to paste a localhost callback URL or a token. The runtime owns
+credentials and callback handling; do not copy them into a profile, asset, environment
+variable or shared file for the local persona flow.
+
+## Explicit remote compatibility
+
+Remote MCP remains supported when deliberately chosen, in remote-only apps, and for
+operator operations (`references/operator-mode.md`). Its managed OAuth chooses the
+character; remote `whoami` needs no Host argument. This is not a local credential repair
+or proof of local memory attachment.
+
+The HTTP examples below apply only to an explicitly selected remote workflow without
+MCP. They assume `SOUL37_API_TOKEN` is already configured by the user/operator outside
+the conversation using their secret-management mechanism. Do not request, display or
+persist it; if absent, have the user configure the remote connection outside chat.
+Revoke remote connections in **Settings → Connected agents**. An account API token
+can cover every owned Host, so each HTTP request must name its intended numeric Host ID;
+never reuse the local runtime's scoped credential for these requests.
+
+## Remote reading
 
 ```bash
 curl -sS --connect-timeout 5 --max-time 20 "https://37soul.com/api/v1/me/hosts/262/soul?turn=1" \
