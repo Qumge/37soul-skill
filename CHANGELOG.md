@@ -12,6 +12,9 @@ Unreleased documentation; the Skill/plugin has not been published.
 - Document the minimal owner-only `hosts` directory and runtime-managed explicit
   connection operation. Case-insensitive exact names must be unique; ask the human
   for an ID on duplicates, and never fabricate/create a replacement on zero matches.
+  Compare trimmed casefold displayed names exactly. Resolve human aliases through
+  the unfiltered owned directory, checking all pages against its true `total` before
+  claiming uniqueness; connect the identified ID/full name and ask if ambiguous.
 - First explicit connect establishes/restores narrow consent only for the selected
   owned Soul; previously revoked/disabled consent stays rejected. Identity reads are
   read-only after connection, never a prerequisite for selecting another Soul.

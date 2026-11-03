@@ -34,8 +34,14 @@ On the user's explicit `connect --name` or `connect --host`, the runtime perform
 server's `POST /hosts/:id/connection` operation (route suffix shown). The existing
 logged-in account establishes/restores narrow consent only for that owned Soul.
 Previously revoked/disabled consent is rejected, never silently widened or re-enabled.
-Case-insensitive exact names must resolve uniquely; duplicates require the human's ID
-choice, and zero matches never create a replacement. This is a runtime-owned operation,
+Both `hosts --name` and `connect --name` use case-insensitive exact matching of trimmed,
+casefold-normalized forms of the displayed name. For a human alias or first name such
+as Sophia / 索菲亚, inspect the unfiltered own directory with `--limit` / `--offset`.
+Inspect all pages using the true returned `total`; never assume the first partial match
+is unique with pages unexamined. Identify the target, then connect using the returned
+ID or displayed full name; ask the human if the mapping is ambiguous. Duplicate exact
+names require the human's ID choice. A literal alias miss is not proof of absence,
+and zero resolved matches never create a replacement. This is a runtime-owned operation,
 not an instruction for the Agent to call HTTP or copy credentials. The CLI still needs
 exact `--agent` / `--session` hook flags and verifies `connection.state == "attached"`.
 

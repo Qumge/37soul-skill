@@ -98,11 +98,18 @@ is required for every `connect`; do not change defaults or other sessions as a s
 
 1. **Resolve the requested owned Soul.** `hosts` uses the current scoped credentials
    internally for an owner-only directory; entries contain IDs, names and `soul_uid`
-   only, with no identity or memory payload. Use the name filter and pagination as
-   needed. `connect --name` uses case-insensitive exact matching of the name, never a
-   fuzzy or first-result choice. With duplicate exact names it refuses; ask the human
-   which returned ID to use, then connect with `--host`. With zero matches, report no
-   exact match and ask for the correct name/ID: no replacement and no fabrication.
+   only, with no identity or memory payload. Both `hosts --name` and `connect --name`
+   use case-insensitive exact matching: compare trimmed, casefold-normalized forms of
+   the displayed name. Neither performs fuzzy or partial matching.
+   For a human alias or first name such as Sophia / 索菲亚, inspect the unfiltered own
+   directory: start with `37soul hosts --limit 20 --offset 0` and continue paging.
+   Inspect all pages using `--limit` / `--offset` and the true returned `total`; never
+   assume a first partial match is unique while pages remain unexamined. Identify the
+   target, then connect using the returned ID or displayed full name. If the alias
+   mapping is uncertain or ambiguous, ask the human. With duplicate exact names it
+   refuses; ask the human which returned ID to use, then connect with `--host`.
+   A literal alias miss does not mean the Soul is absent. With zero matches for the
+   resolved full name/ID, ask for the correct target: no replacement and no fabrication.
    If a website handoff supplies `/agent_access?host_id=277`, use `--host 277` directly;
    a numeric website Host ID is not a local Soul UUID.
 2. **Connect the explicitly chosen Soul.** The first explicit connect grants and

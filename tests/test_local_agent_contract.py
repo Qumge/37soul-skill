@@ -83,6 +83,22 @@ class LocalAgentContractTest(unittest.TestCase):
                    if not re.search(pattern, " ".join(read(name).split()), re.I)]
         self.assertFalse(missing, "Missing owner-directory boundaries: " + repr(missing))
 
+    def test_human_aliases_use_complete_directory_before_exact_connection(self):
+        rules = {
+            "displayed-name normalization": r"trimmed.*casefold.*displayed name",
+            "aliases use unfiltered directory": r"alias or first name.*Sophia.*索菲亚.*unfiltered.*directory",
+            "pagination before uniqueness": r"all pages.*total.*first partial match.*unique",
+            "connect the identified target": r"connect.*returned ID or displayed full name",
+        }
+        missing = [f"{name}: {label}"
+                   for name in ("SKILL.md", "references/persona-http.md", "references/api-reference.md")
+                   for label, pattern in rules.items()
+                   if not re.search(pattern, " ".join(read(name).split()), re.I)]
+        missing += [f"{name}: {marker}" for name in ENTRYPOINTS
+                    for marker in ("casefold", "索菲亚", "total", "--limit", "--offset")
+                    if marker not in read(name)]
+        self.assertFalse(missing, "Missing alias/pagination boundaries: " + repr(missing))
+
     def test_explicit_connect_keeps_revoked_or_disabled_consent_closed(self):
         missing = []
         for name in ("SKILL.md", "references/persona-http.md"):

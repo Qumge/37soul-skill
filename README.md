@@ -84,11 +84,19 @@ Example sequence; replace placeholders only with the exact managed hook flags:
 ```
 
 The owner-only directory uses current scoped credentials internally and returns only
-IDs, names and `soul_uid`; it does not fetch identity or memories. Names match exactly,
-case-insensitively. Duplicate exact names are refused: ask the human which returned ID
+IDs, names and `soul_uid`; it does not fetch identity or memories. Both name commands
+compare trimmed, casefold-normalized displayed names exactly, with no fuzzy/partial matching. Duplicate exact names are refused: ask the human which returned ID
 to use, then connect with `--host`. Zero matches mean ask for the correct name/ID;
 never create a replacement or invent a match. A website handoff
 `/agent_access?host_id=277` can directly supply numeric `--host 277`, not a Soul UUID.
+
+For a human alias/first name such as Sophia / 索菲亚, inspect the unfiltered own directory
+with `37soul hosts --limit 20 --offset 0`, then continue through all pages using
+`--limit` / `--offset` and the true returned `total`. A first partial match is not proven
+unique while pages remain unexamined. Connect using the identified returned ID or
+displayed full name; ask the human if the mapping is uncertain or names are duplicated.
+An alias missing from the exact filter does not prove absence and never warrants a
+replacement Soul.
 
 The first explicit connect grants/restores narrow consent for only that owned Soul
 through the logged-in account. Previously revoked/disabled consent stays rejected;
