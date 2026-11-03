@@ -177,14 +177,19 @@ class LocalAgentContractTest(unittest.TestCase):
                    for version in ("0.15.0+", "0.14.2") if version not in read(name)]
         for name in ("SKILL.md", "references/persona-http.md"):
             text = " ".join(read(name).split())
-            if not re.search(r"0\.15\.0.*unpublished candidate", text, re.I):
-                missing.append(name + ": candidate is not a published release")
+            if not re.search(r"check.*installed runtime.*version.*before", text, re.I):
+                missing.append(name + ": check installed runtime version before local commands")
             if not re.search(r"unknown command.*stop.*never run .*login.*OAuth", text, re.I):
                 missing.append(name + ": unknown-command recovery must stop before auth")
+        blockers = ("unpublished candidate", "compatible local candidate", "wait for its release",
+                    "尚未发布的候选版本", "未公開の候補版")
+        missing += [f"{name}: stale release blocker" for name in ENTRYPOINTS + ("references/api-reference.md",)
+                    if any(blocker in read(name) for blocker in blockers)]
         self.assertFalse(missing, "Missing local runtime version gate: " + repr(missing))
 
     def test_skill_and_plugin_versions_match_latest_changelog(self):
         latest = re.search(r"^## (\d+\.\d+\.\d+) -", read("CHANGELOG.md"), re.M).group(1)
+        self.assertEqual(latest, "6.13.0", "Formal skill release version")
         versions = {
             "SKILL.md": re.search(r"^  version: (.+)$", read("SKILL.md"), re.M).group(1),
             "marketplace.json": json.loads(read("marketplace.json"))["version"],

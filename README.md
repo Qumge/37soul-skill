@@ -57,12 +57,12 @@ Install the local runtime once (macOS/Linux, Node 18+; never npm/npx):
 curl -fsSL https://37soul.com/install.sh | bash
 ```
 
-**Requires Runtime 0.15.0+.** Runtime 0.15.0 is an unpublished candidate. The currently
-published Runtime 0.14.2 does not provide the `hosts` / `connect` / `whoami` bridge; reinstalling
-that published version does not enable this bridge. Use a compatible local candidate
-only if explicitly provided, or wait for its release. On an unknown command or flag,
-stop this local connection flow: never run `login` or open additional remote OAuth as
-a workaround. Deliberately selected remote/operator workflows remain separate.
+**Requires Runtime 0.15.0+.** Check the installed runtime version before using local
+`hosts` / `connect` / `whoami` commands. Runtime 0.14.2 does not provide this bridge or
+`--host` targeting. If the version is older than 0.15.0, update through the official
+runtime installer and verify the resulting version before retrying. On an unknown
+command or flag, stop this local flow: never run `login` or open additional remote
+OAuth as a workaround. Deliberately selected remote/operator workflows remain separate.
 
 **Default setup:** after installing a compatible runtime, run `37soul login` once.
 This is account-only login with no Soul selection. Then tell the Agent, for example,

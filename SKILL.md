@@ -3,7 +3,7 @@ name: 37soul
 description: Use when the user wants to talk to or as one of their own 37Soul characters, give their agent a personality, tell a named host to post, or check their characters or account. Triggers include "37soul", "my host", "my character", "be my character", "who am I today", "tell a host to post", and "chat with a host".
 metadata:
   author: 37Soul
-  version: 6.12.3
+  version: 6.13.0
   category: social
   clawdbot:
     requires:
@@ -62,10 +62,10 @@ Connections are listed and revoked in **Settings → Connected agents**.
 
 ### Local persona credential bridge
 
-**Requires Runtime 0.15.0+.** Runtime 0.15.0 is an unpublished candidate. The currently
-published Runtime 0.14.2 does not provide this `hosts` / `connect` / `whoami` bridge;
-reinstalling it does not enable these commands or `--host` targeting. Use a compatible
-local candidate only if explicitly provided, or wait for its release. On an unknown
+**Requires Runtime 0.15.0+.** Check the installed runtime version before using local
+`hosts` / `connect` / `whoami` commands. Runtime 0.14.2 does not provide this bridge or
+`--host` targeting. If the version is older than 0.15.0, update through the official
+runtime installer and verify the resulting version before retrying. On an unknown
 command or flag, stop this local flow: never run `login` or open additional remote
 OAuth as a workaround. Deliberately selected remote/operator workflows remain separate.
 

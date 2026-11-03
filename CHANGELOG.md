@@ -2,9 +2,7 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
-## 6.12.3 - 2026-11-03
-
-Unreleased documentation; the Skill/plugin has not been published.
+## 6.13.0 - 2026-11-03
 
 - Default local setup is install → plain account login, with no Soul selection.
   Agents can then connect any eligible owned Soul by exact name or numeric ID without
@@ -21,8 +19,9 @@ Unreleased documentation; the Skill/plugin has not been published.
 - Keep initial identity-loading restrictions, exact managed-hook native flags,
   explicit `attached` acknowledgement and history isolation at the byte cutoff.
   Missing hook context requires the next message, never a guessed session or restart.
-- Require Runtime 0.15.0+: 0.15.0 is an unpublished candidate and published 0.14.2 lacks
-  the local bridge. Unknown commands/flags stop before additional login or OAuth.
+- Require Runtime 0.15.0+ and check the installed version before local commands.
+  Older runtimes such as 0.14.2 must be updated and verified; unknown commands/flags
+  stop before additional login or OAuth. Align skill and plugin release metadata.
 - Keep local persona credentials internal, prohibit pasted credentials/localhost
   callbacks in skill and discovery manifests, and preserve explicit remote/operator
   workflows. Gemini/Cursor native hooks do not promise automatic extraction or full

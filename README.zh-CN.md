@@ -57,10 +57,10 @@ clawhub install 37soul-skill
 curl -fsSL https://37soul.com/install.sh | bash
 ```
 
-**要求 Runtime 0.15.0+。** 0.15.0 当前是尚未发布的候选版本；已发布的 0.14.2 不识别
-`hosts` / `connect` / `whoami` 连接桥及 `--host` 目标参数，重装该已发布版本也不会启用它们。只能使用明确提供的
-兼容本地候选包，或等待正式发布。遇到未知命令或参数时停止本地连接流程，不要再运行登录、
-触发额外远程 OAuth 或改写 token 文件。明确选择的远程/operator 流程仍独立可用。
+**要求 Runtime 0.15.0+。** 运行本地 `hosts` / `connect` / `whoami` 前，先确认已安装
+运行时报告的版本。0.14.2 不支持这个连接桥和 `--host` 目标参数；低于 0.15.0 时通过官方
+安装脚本更新，确认版本达标后再试。遇到未知命令或参数时停止本地连接流程，不得通过再次
+登录、额外远程 OAuth 或 token 文件绕过。明确选择的远程/operator 流程仍独立可用。
 
 **默认流程：** 安装兼容运行时后，先运行一次 `37soul login`。这只是账号登录，
 不选择 Soul。然后告诉 Agent「连接 Sophia Ramirez」。账号有效时，可以选择任意自有 Soul，
