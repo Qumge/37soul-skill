@@ -6,6 +6,13 @@ manage a token or open remote OAuth to read its persona.
 
 ## Local credential bridge
 
+**Requires Runtime 0.15.0+.** Runtime 0.15.0 is an unpublished candidate. The currently
+published Runtime 0.14.2 does not recognize `whoami`, `connect` or `--host`; reinstalling
+that published version does not enable this bridge. Use a compatible local candidate
+only if explicitly provided, or wait for its release. On an unknown command or flag,
+stop this local connection flow: never run `login` or open additional remote OAuth as
+a workaround. Deliberately selected remote/operator workflows remain separate.
+
 The website handoff `/agent_access?host_id=277` supplies the numeric Host ID: use
 `--host 277`, not a local Soul UUID.
 
@@ -43,8 +50,9 @@ to send their next message so `UserPromptSubmit` can supply it, then retry with 
 flags. Never infer a native session from the terminal or ask for a console restart.
 If approval is missing or revoked, use
 `37soul login --host 277`: the approval page preselects this target. The user completes
-it in the browser; then retry the local command. An unrecognized command/flag means the
-installed runtime needs updating, not that remote authentication should be used.
+it in the browser; then retry the local command. An unrecognized command/flag is a
+compatibility failure covered by the version gate above, not missing consent; do not
+start another login.
 
 Never read or write token files or credential stores, never print credentials, and
 never ask the user to paste a localhost callback URL or a token. The runtime owns

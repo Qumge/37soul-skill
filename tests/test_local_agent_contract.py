@@ -115,6 +115,17 @@ class LocalAgentContractTest(unittest.TestCase):
                    not in text]
         self.assertFalse(missing, "Missing discovery-time callback prohibition: " + repr(missing))
 
+    def test_local_bridge_requires_a_compatible_runtime_before_authentication(self):
+        missing = [f"{name}: {version}" for name in ENTRYPOINTS
+                   for version in ("0.15.0+", "0.14.2") if version not in read(name)]
+        for name in ("SKILL.md", "references/persona-http.md"):
+            text = " ".join(read(name).split())
+            if not re.search(r"0\.15\.0.*unpublished candidate", text, re.I):
+                missing.append(name + ": candidate is not a published release")
+            if not re.search(r"unknown command.*stop.*never run .*login.*OAuth", text, re.I):
+                missing.append(name + ": unknown-command recovery must stop before auth")
+        self.assertFalse(missing, "Missing local runtime version gate: " + repr(missing))
+
     def test_skill_and_plugin_versions_match_latest_changelog(self):
         latest = re.search(r"^## (\d+\.\d+\.\d+) -", read("CHANGELOG.md"), re.M).group(1)
         versions = {

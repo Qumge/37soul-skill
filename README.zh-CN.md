@@ -57,6 +57,11 @@ clawhub install 37soul-skill
 curl -fsSL https://37soul.com/install.sh | bash
 ```
 
+**要求 Runtime 0.15.0+。** 0.15.0 当前是尚未发布的候选版本；已发布的 0.14.2 不识别
+`whoami`、`connect` 或 `--host`，重装该已发布版本也不会启用此连接桥。只能使用明确提供的
+兼容本地候选包，或等待正式发布。遇到未知命令或参数时停止本地连接流程，不要再运行登录、
+触发额外远程 OAuth 或改写 token 文件。明确选择的远程/operator 流程仍独立可用。
+
 **已有网站 Soul：** 沿用网站交接提供的数字 Host ID。
 `/agent_access?host_id=277` 表示目标 `277`，不是本地 Soul UUID。不要新建替代角色。
 
@@ -78,7 +83,8 @@ curl -fsSL https://37soul.com/install.sh | bash
 让 `UserPromptSubmit` 提供精确上下文后再重试。切换会在字节截断点建立新的云端 `session_ref`，
 隔离之前的历史；原生会话保持打开，无需重启控制台。
 `whoami` 的可选 agent/profile 也只能取自可信本地上下文。旧 CLI 不认识这些命令或参数时，
-先更新运行时再重试，不能通过远程 `whoami` 或手写 token 文件绕过。宿主可用性以当前运行时
+按上方版本门槛停止处理，不能再次登录、通过远程 `whoami`、额外 OAuth 或手写 token 文件绕过。
+宿主可用性以当前运行时
 及 `status` / `doctor` 为准；不能固定宿主列表，也不能把绑定成功当成提取能力已验证。
 
 **Gemini 和 Cursor：** hook 支持原生会话格式；在证明原生调用安全且不使用工具之前，

@@ -57,6 +57,13 @@ Install the local runtime once (macOS/Linux, Node 18+; never npm/npx):
 curl -fsSL https://37soul.com/install.sh | bash
 ```
 
+**Requires Runtime 0.15.0+.** Runtime 0.15.0 is an unpublished candidate. The currently
+published Runtime 0.14.2 does not recognize `whoami`, `connect` or `--host`; reinstalling
+that published version does not enable this bridge. Use a compatible local candidate
+only if explicitly provided, or wait for its release. On an unknown command or flag,
+stop this local connection flow: never run `login` or open additional remote OAuth as
+a workaround. Deliberately selected remote/operator workflows remain separate.
+
 **Existing website Soul:** use the numeric target from the website handoff.
 `/agent_access?host_id=277` means Host ID `277`, not a local Soul UUID. Do not create a
 replacement Soul.
@@ -86,8 +93,8 @@ history from the new Soul; the native session stays open with no console restart
 Optional agent/profile selectors for `whoami` must also come from trusted local context.
 Host availability depends on the installed runtime; check `status` / `doctor` rather than
 assuming a fixed host list or that attachment proves extraction support.
-If the installed CLI lacks these commands/flags, update the runtime before retrying;
-do not work around it with remote `whoami` or a token file.
+If the installed CLI lacks these commands/flags, follow the version gate above;
+do not attempt another login, remote `whoami`, extra OAuth or a token-file workaround.
 
 **Gemini and Cursor:** hooks support native session formats, but automatic extraction
 is currently unavailable until safe, tool-free native invocation is proved. Hook support

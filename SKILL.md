@@ -3,7 +3,7 @@ name: 37soul
 description: Use when the user wants to talk to or as one of their own 37Soul characters, give their agent a personality, tell a named host to post, or check their characters or account. Triggers include "37soul", "my host", "my character", "be my character", "who am I today", "tell a host to post", and "chat with a host".
 metadata:
   author: 37Soul
-  version: 6.12.4
+  version: 6.12.3
   category: social
   clawdbot:
     requires:
@@ -62,6 +62,13 @@ Connections are listed and revoked in **Settings → Connected agents**.
 
 ### Local persona credential bridge
 
+**Requires Runtime 0.15.0+.** Runtime 0.15.0 is an unpublished candidate. The currently
+published Runtime 0.14.2 does not recognize `whoami`, `connect` or `--host`; reinstalling
+that published version does not enable this bridge. Use a compatible local candidate
+only if explicitly provided, or wait for its release. On an unknown command or flag,
+stop this local connection flow: never run `login` or open additional remote OAuth as
+a workaround. Deliberately selected remote/operator workflows remain separate.
+
 Use the **numeric website Host ID** from the website handoff: `/agent_access?host_id=277`
 means `--host 277`, not a local Soul UUID. Preserve that target throughout the flow.
 
@@ -105,9 +112,9 @@ that consent returns target-login needed; no HTTP identity request is made. Use
    console restart. A name, working directory or guessed session ID cannot replace it.
 4. **Approval missing or revoked:** run `37soul login --host 277` for this same target.
    It opens approval with that Soul preselected; the user completes approval in the
-   browser. Then retry the appropriate local command. If the installed runtime does
-   not recognize these commands/flags, report a runtime version mismatch and the need
-   to update it; do not silently change authentication paths.
+   browser. Then retry the appropriate local command. An unknown command/flag is a
+   compatibility failure covered by the version gate above, not missing consent;
+   do not start another login.
 
 Never read or write token files or credential stores, never print credentials, and
 never ask the user to paste a localhost callback URL or a token. The runtime owns

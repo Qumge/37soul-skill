@@ -2,8 +2,14 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
-## 6.12.4 - 2026-11-03
+## 6.12.3 - 2026-11-03
 
+Unreleased documentation; the Skill/plugin has not been published.
+
+- Gate local identity/connection commands on Runtime 0.15.0+. The 0.15.0 candidate
+  is not published; published 0.14.2 lacks `whoami`, `connect` and `--host`. Unknown
+  commands/flags stop the flow before login or extra OAuth, pending a compatible
+  candidate or release.
 - Clarify that local identity reads require restored per-Soul identity consent;
   account-only login without it requires targeted login and makes no HTTP identity
   request. Keep the existing `login --host` recovery and remote workflows.
@@ -12,8 +18,6 @@ All notable changes to the 37Soul Skill will be documented in this file.
   memory growth or a fixed supported-host count.
 - Keep the prohibition on pasted credentials and localhost approval callbacks in
   discovery manifest descriptions as well as the skill; extend contract checks.
-
-## 6.12.3 - 2026-11-03
 
 - Document the local Agent credential bridge: explicit numeric website Host IDs,
   local scoped identity reads, targeted browser approval, and restore/attach or safe
