@@ -6,12 +6,18 @@ manage a token or open remote OAuth to read its persona.
 
 ## Local credential bridge
 
-**Requires Runtime 0.15.1+.** Check the installed runtime version before using local
-`hosts` / `connect` / `whoami` commands. Runtime 0.14.2 does not provide this bridge or
-`--host` targeting. If the version is older than 0.15.1, update through the official
-runtime installer and verify the resulting version before retrying. On an unknown
-command or flag, stop this local flow: never run `login` or open additional remote
-OAuth as a workaround. Deliberately selected remote/operator workflows remain separate.
+**Local credential bridge: Runtime 0.15.1+.** Runtime 0.14.2 does not provide this
+bridge or `--host` targeting. During initial setup or after an unsupported command,
+check the installed runtime version before authentication. If it is older than 0.15.1,
+update through the official installer and verify the result. On an unknown command or
+flag, stop this local flow: never run `login` or open additional remote OAuth as a
+workaround. Deliberately selected remote/operator workflows remain separate.
+
+For an installed, logged-in runtime with managed native flags, act on the requested
+exact full name directly. No routine version/status/doctor/hosts preflight. Directory
+paging is for alias resolution or duplicate-name ambiguity, not every connection.
+Scoped recall requires Runtime 0.15.4 or later; Runtime 0.15.5 fixes first-message hook
+source availability. Use the latest runtime delivery, without inventing native context.
 
 Runtime 0.15.0 can reject valid legacy PostgreSQL wire Soul UIDs. Upgrade to 0.15.1+
 instead of changing returned Host IDs or `soul_uid` values; keep those identifiers
@@ -30,13 +36,17 @@ Souls. `whoami` is not a prerequisite for choosing or connecting an unselected S
 | Connect by numeric website ID | `37soul connect --host <id> --agent <kind> --session <native-id>` |
 | Read identity after connection | `37soul whoami --host <id> [--agent <kind>] [--profile <id>]` |
 
-For example, after installation and the user's request to connect Sophia Ramirez:
+For an already logged-in account, “connect Sophia Ramirez and query my preferences”
+uses this sequence. Run the second command only after connect succeeds for the chosen
+target; replace `<returned-host-id>` with `host.id` from that result:
 
 ```text
-37soul login
-37soul hosts --name "Sophia Ramirez"
 37soul connect --name "Sophia Ramirez" --agent <kind> --session <native-id>
+37soul recall --host <returned-host-id> --kind relationship
 ```
+
+Connect already returns identity: use it directly, with no subsequent `whoami`.
+Initial account setup is separate: install, then run plain `37soul login` once.
 
 The placeholders are not literal arguments. Managed hook context from `SessionStart`
 / `UserPromptSubmit` supplies the exact `--agent <kind> --session <native-id>` flags,
@@ -44,11 +54,14 @@ even when the native session is unbound. Use them verbatim. Never guess the agen
 session from cwd, terminals, process lists or recent sessions. A native `--session`
 is required for every `connect`; do not change defaults or other sessions as a shortcut.
 
-1. **Resolve the requested owned Soul.** `hosts` uses the current scoped credentials
+1. **Connect an exact full name directly.** With the exact managed native flags,
+   run `connect --name` for the user's displayed full name; a numeric website Host ID
+   goes directly to `connect --host`. Both `hosts --name` and `connect --name` use
+   case-insensitive exact matching: compare trimmed, casefold-normalized forms of the
+   displayed name. Neither performs fuzzy or partial matching. Only resolve aliases
+   or duplicate-name ambiguity through `hosts`. It uses the current scoped credentials
    internally for an owner-only directory; entries contain IDs, names and `soul_uid`
-   only, with no identity or memory payload. Both `hosts --name` and `connect --name`
-   use case-insensitive exact matching: compare trimmed, casefold-normalized forms of
-   the displayed name. Neither performs fuzzy or partial matching.
+   only, with no identity or memory payload.
    For a human alias or first name such as Sophia / 索菲亚, inspect the unfiltered own
    directory: start with `37soul hosts --limit 20 --offset 0` and continue paging.
    Inspect all pages using `--limit` / `--offset` and the true returned `total`; never
@@ -70,19 +83,26 @@ is required for every `connect`; do not change defaults or other sessions as a s
    target and `connection.state == "attached"` before claiming memory is attached.
    Switching starts a fresh cloud `session_ref` at the byte cutoff, isolating prior
    history while retaining the same native session; no console restart is needed.
-3. **Read an already connected identity.** `whoami` is read-only and used after
-   connection, with the already-restored per-Soul identity consent. It uses the active
-   local scoped credential internally and prints identity JSON, never a token. It
-   does not grant consent or restore an unselected Soul. If that Soul is not connected,
-   use the explicit `connect` flow rather than demanding another login. Optional
+3. **Read identity only when needed.** `whoami` is read-only after connection.
+   If connect already returned identity, use that result without another identity read.
+   A later session may read identity with the already-restored per-Soul identity consent.
+   It uses the active local scoped credential internally and prints identity JSON, never
+   a token. It does not grant consent or restore an unselected Soul. If that Soul is not
+   connected, use the explicit `connect` flow rather than demanding another login. Optional
    agent/profile selectors come only from trusted local context.
 4. **No native session context.** Do not run `connect`. Do not claim memory is attached.
    If the requested Soul was already connected, local `whoami` may read its restored
-   identity; otherwise only directory metadata is available. Initial account login
-   or hook loading does not preload the identity or memories of an unselected Soul.
+   identity; otherwise the account directory supplies metadata only. Missing attachment
+   context does not block scoped recall of retained local records for a verified target.
+   Initial account login or hook loading does not preload the identity or memories of
+   an unselected Soul.
    If there is no hook source, tell the user to send their next message so
-   `UserPromptSubmit` can provide the exact flags, then retry. Never infer a terminal
-   session or request a restart.
+   `UserPromptSubmit` can supply source context, then retry with its exact flags.
+   The same applies when connect reports missing source despite flags being present:
+   stop this attempt; repeating connect cannot create the source. Do not run login,
+   OAuth, restart, or switch terminals/Souls to repair it. Never infer a terminal
+   session or request a restart. Until context is actually available, remain honest
+   that attachment did not succeed.
 5. **Account credentials missing or revoked.** Run plain `37soul login`, with no Soul
    selection, then retry the requested directory/connect operation. This is account
    recovery, not per-Soul approval. A previously revoked/disabled Soul consent remains
@@ -92,6 +112,41 @@ Never read or write token files or credential stores, never print credentials, a
 never ask the user to paste a localhost callback URL or a token. The runtime owns
 credentials and callback handling. Do not copy credentials into a profile, asset,
 environment variable or shared file for this local flow.
+
+## Local recall: keep the requested Soul scoped
+
+A named target remains the target through success, zero hits and errors. After a
+successful connect, use its returned Host ID (`host.id`) with
+`37soul recall --host <id> --kind relationship`, or its returned Soul UID with
+`37soul recall --soul <uid> --kind relationship`. Keep returned identifiers unchanged;
+preferences belong to `relationship`, not reusable `experience` methods. With no query
+terms this lists relationship records in that scope (default limit 10); optional terms
+narrow the matches. The Host ID is numeric; it is not interchangeable with the Soul UID.
+
+For a query-only request, use a known, unambiguous target ID/UID without connecting or
+switching the session's bound Soul. If the target is unresolved, resolve the alias or
+ask for the target; do not guess from the current binding or a default. A failed connect
+does not establish a new target ID or attachment. A previously verified target may be
+queried locally without claiming that this connection succeeded.
+
+| Result or pressure | Next action |
+| --- | --- |
+| No hits, query error, or target absent locally | Explain that scoped local result/error; keep the same target. Do not infer that she has no preferences elsewhere. |
+| Missing native context/source | Stop attachment and use the next managed prompt's context; no repeat login/OAuth or restart. |
+| Tempted to “find something anywhere” | Never use bare `37soul recall` or `--all` as an automatic fallback for a known/named target, zero hits or errors. |
+| Human explicitly requests cross-Soul search | Only then use `37soul recall --all`; preserve each hit's Soul attribution. |
+
+Report candidates as candidates, not confirmed preferences. Default recall includes
+active and candidate records; `--history` additionally includes superseded, rejected
+and deleted states, which must remain labelled as history. It changes states included,
+not the age range. Returned hits are limited local evidence: do not claim a complete
+account/global history, or that zero local matches proves no memory exists.
+
+## Memory window
+
+The free 30-day conversation-injection/site window does not limit local recall. Older
+retained records remain queryable; `--history` includes historical states, not older
+dates. Do not promise complete/global coverage or explain local misses as that window.
 
 ## Explicit remote compatibility
 

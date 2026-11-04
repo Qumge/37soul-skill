@@ -57,10 +57,12 @@ clawhub install 37soul-skill
 curl -fsSL https://37soul.com/install.sh | bash
 ```
 
-**要求 Runtime 0.15.1+。** 运行本地 `hosts` / `connect` / `whoami` 前，先确认已安装
-运行时报告的版本。0.14.2 不支持这个连接桥和 `--host` 目标参数；低于 0.15.1 时通过官方
-安装脚本更新，确认版本达标后再试。遇到未知命令或参数时停止本地连接流程，不得通过再次
-登录、额外远程 OAuth 或 token 文件绕过。明确选择的远程/operator 流程仍独立可用。
+**本地连接桥要求 Runtime 0.15.1+。** 0.14.2 不支持连接桥和 `--host`。初次安装或
+遇到未知命令时确认版本；低于 0.15.1 时通过官方安装脚本更新并确认结果。未知命令/参数应
+停止，不通过再次登录、远程 OAuth 或 token 文件绕过。账号已登录且有受管理原生参数时，
+完整名字直接连接，不例行运行 version/status/doctor/hosts。目录分页只用于简称或重名歧义。
+限定 Soul 的 recall 需要 Runtime 0.15.4 或更高；0.15.5 修复首条消息的 hook source 时序，
+仍必须取得真实原生上下文，不得猜测。
 
 0.15.0 可能拒绝有效的旧 PostgreSQL wire Soul UID。应升级到 0.15.1+，保持返回的 Host ID
 和 `soul_uid` 原样，不得改写这些标识符来绕过旧校验，也不要因此重复登录/OAuth。
@@ -77,12 +79,13 @@ curl -fsSL https://37soul.com/install.sh | bash
 | 按数字 ID 连接 | `37soul connect --host <id> --agent <kind> --session <native-id>` |
 | 连接后只读身份 | `37soul whoami --host <id> [--agent <kind>] [--profile <id>]` |
 
-流程示例；占位符只能替换为受管理 hook 提供的精确参数：
+账号已登录、用户说「连接 Sophia Ramirez 并查询我的偏好」时，使用 hook 精确参数直接连接。
+仅在连接成功后运行第二条，把 `<returned-host-id>` 替换为返回的 `host.id`：
 ```text
-37soul login
-37soul hosts --name "Sophia Ramirez"
 37soul connect --name "Sophia Ramirez" --agent <kind> --session <native-id>
+37soul recall --host <returned-host-id> --kind relationship
 ```
+连接已返回身份，不再重复 `whoami`。仅查询时使用已确认的目标 ID/UID，不切换会话绑定的 Soul。
 
 `hosts` 在内部使用当前 scoped credential，只列出当前账号自有角色的 ID、名字和
 `soul_uid`，不读取身份或记忆。两个名字命令均对显示名去除首尾空白并做 casefold 后完整匹配，
@@ -109,6 +112,13 @@ scoped credential，不暴露 token。连接前只允许读取目录元数据；
 未选择 Soul 的身份或记忆。若此前已连接，缺少新的原生会话上下文时仍可只读已恢复身份。
 可选 agent/profile 只取自可信上下文。账号凭据缺失/撤销时使用普通 `37soul login`；
 Soul 尚未连接时使用显式 `connect`。未知命令按上方版本门槛停止，不通过再登录或远程 OAuth 绕过。
+
+记忆查询始终限定返回的 `--host <id>` 或 `--soul <uid>`；偏好用 `--kind relationship`。
+零命中或错误不能自动改用裸 `recall` 或 `--all`；只有用户明确要求跨 Soul 搜索才用 `--all`。
+候选仍标为候选，历史仍标为历史；有限本地结果不能证明全局完整性。免费 30 天窗口是对话注入/
+网站策略，不是本地 recall 的年龄限制；旧记录仍可查，`--history` 切换状态而非日期范围。
+缺少原生 source 时停止当前连接，等下一条消息的受管理上下文；不重复连接、登录/OAuth、
+重启或猜测会话。
 
 **Gemini 和 Cursor：** hook 支持原生会话格式；在证明原生调用安全且不使用工具之前，
 自动提取当前明确不可用。hook 支持或身份绑定成功不代表完整记忆生长可用。

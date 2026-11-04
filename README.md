@@ -13,7 +13,9 @@ stays local, and only long-term soul assets sync to 37Soul after you log in and 
 
 37Soul is free to use. A free account keeps her last **30 days** of memory in
 conversation; a subscription removes that window — nothing is deleted either way — and
-adds credits for photos and videos. Binding her to your own agent costs nothing extra.
+adds credits for photos and videos. This is a conversation-injection/site window;
+older retained records remain queryable locally without `--history`. That flag includes
+historical states, not older dates. Binding her to your own agent costs nothing extra.
 [Pricing](https://37soul.com/pricing?ref=skill-readme)
 
 ---
@@ -57,12 +59,18 @@ Install the local runtime once (macOS/Linux, Node 18+; never npm/npx):
 curl -fsSL https://37soul.com/install.sh | bash
 ```
 
-**Requires Runtime 0.15.1+.** Check the installed runtime version before using local
-`hosts` / `connect` / `whoami` commands. Runtime 0.14.2 does not provide this bridge or
-`--host` targeting. If the version is older than 0.15.1, update through the official
-runtime installer and verify the resulting version before retrying. On an unknown
-command or flag, stop this local flow: never run `login` or open additional remote
-OAuth as a workaround. Deliberately selected remote/operator workflows remain separate.
+**Local credential bridge: Runtime 0.15.1+.** Runtime 0.14.2 does not provide this
+bridge or `--host` targeting. During initial setup or after an unsupported command,
+check the installed runtime version before authentication. If it is older than 0.15.1,
+update through the official installer and verify the result. On an unknown command or
+flag, stop this local flow: never run `login` or open additional remote OAuth as a
+workaround. Deliberately selected remote/operator workflows remain separate.
+
+For an installed, logged-in runtime with managed native flags, act on the requested
+exact full name directly. No routine version/status/doctor/hosts preflight. Directory
+paging is for alias resolution or duplicate-name ambiguity, not every connection.
+Scoped recall requires Runtime 0.15.4 or later; Runtime 0.15.5 fixes first-message hook
+source availability. Use the latest runtime delivery, without inventing native context.
 
 Runtime 0.15.0 can reject valid legacy PostgreSQL wire Soul UIDs. Upgrade to 0.15.1+
 instead of changing returned Host IDs or `soul_uid` values; keep those identifiers
@@ -80,12 +88,15 @@ This is account-only login with no Soul selection. Then tell the Agent, for exam
 | Connect by numeric ID | `37soul connect --host <id> --agent <kind> --session <native-id>` |
 | Read after connection | `37soul whoami --host <id> [--agent <kind>] [--profile <id>]` |
 
-Example sequence; replace placeholders only with the exact managed hook flags:
+Already logged in, with an exact full name and managed hook flags: connect directly.
+For “connect Sophia Ramirez and query my preferences”, run recall only after a
+successful connect, replacing `<returned-host-id>` with its returned `host.id`:
 ```text
-37soul login
-37soul hosts --name "Sophia Ramirez"
 37soul connect --name "Sophia Ramirez" --agent <kind> --session <native-id>
+37soul recall --host <returned-host-id> --kind relationship
 ```
+Use the returned identity without a second `whoami`. Directory paging is only for
+aliases or duplicate-name ambiguity. A query alone must not switch the bound Soul.
 
 The owner-only directory uses current scoped credentials internally and returns only
 IDs, names and `soul_uid`; it does not fetch identity or memories. Both name commands
@@ -115,14 +126,21 @@ memory attachment; send the next message so `UserPromptSubmit` can provide the f
 A switch starts a fresh cloud `session_ref` at the byte cutoff to isolate prior history;
 the native session stays open with no console restart.
 
-`whoami` is read-only after connection, not a prerequisite that demands login for an
-unselected Soul. It uses internal scoped credentials and never exposes a token. Before
+`whoami` is read-only after connection; skip it when connect already returned identity.
+It is not a prerequisite that demands login for an unselected Soul. It uses internal scoped credentials and never exposes a token. Before
 connection, only directory metadata is available; account login and initial hooks do
 not preload an unselected Soul's identity or memory. If already connected, local
 `whoami` can read the restored persona even without new native-session context. Optional
 agent/profile selectors come from trusted context. Missing/revoked account credentials
 require plain `37soul login`; an unselected Soul needs explicit connect. Unknown commands
 stop at the version gate above, without another login or remote OAuth workaround.
+
+Keep a named memory query scoped with the returned `--host <id>` or `--soul <uid>`;
+preferences use `--kind relationship`. Zero hits/errors never justify bare `recall` or
+`--all`; use `--all` only for an explicitly requested cross-Soul search. Label candidate
+and historical records honestly; limited local results never prove global completeness.
+If connect reports missing native source, stop and use the next managed message's
+context; no repeated connect, login/OAuth, restart or guessed session.
 
 **Gemini and Cursor:** hooks support native session formats, but automatic extraction
 is currently unavailable until safe, tool-free native invocation is proved. Hook support

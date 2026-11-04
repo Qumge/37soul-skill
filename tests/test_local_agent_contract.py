@@ -58,12 +58,7 @@ class LocalAgentContractTest(unittest.TestCase):
                    if not re.search(pattern, " ".join(read(name).split()), re.I)]
         self.assertFalse(missing, "Missing safety boundaries: " + repr(missing))
 
-    def test_account_login_precedes_name_connect_without_whoami_preflight(self):
-        example = ('37soul login\n'
-                   '37soul hosts --name "Sophia Ramirez"\n'
-                   '37soul connect --name "Sophia Ramirez" --agent <kind> --session <native-id>')
-        missing = [name for name in ENTRYPOINTS if example not in read(name)]
-        self.assertFalse(missing, "Missing account-login then explicit-connect example: " + repr(missing))
+    def test_account_login_does_not_select_soul_or_require_whoami_preflight(self):
         missing = [name for name in ("SKILL.md", "references/persona-http.md")
                    if not re.search(r"account-only.*no Soul selection.*"
                                     r"whoami.*not a prerequisite", " ".join(read(name).split()), re.I)]
@@ -189,7 +184,7 @@ class LocalAgentContractTest(unittest.TestCase):
 
     def test_skill_and_plugin_versions_match_latest_changelog(self):
         latest = re.search(r"^## (\d+\.\d+\.\d+) -", read("CHANGELOG.md"), re.M).group(1)
-        self.assertEqual(latest, "6.13.2", "Formal skill release version")
+        self.assertEqual(latest, "6.13.3", "Formal skill release version")
         versions = {
             "SKILL.md": re.search(r"^  version: (.+)$", read("SKILL.md"), re.M).group(1),
             "marketplace.json": json.loads(read("marketplace.json"))["version"],

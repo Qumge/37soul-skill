@@ -59,11 +59,13 @@ clawhub install 37soul-skill
 curl -fsSL https://37soul.com/install.sh | bash
 ```
 
-**Runtime 0.15.1+ が必要です。** ローカルの `hosts` / `connect` / `whoami` を使う前に、
-インストール済みランタイムが報告するバージョンを確認します。0.14.2 にはこの接続機能と
-`--host` 指定がありません。0.15.1 未満なら公式インストーラーで更新し、バージョンを再確認
-してから試します。未知のコマンドや引数なら停止し、再ログイン、追加のリモート OAuth、
-token ファイルで回避しません。明示的なリモート/operator 接続は別の経路として利用できます。
+**ローカル接続機能には Runtime 0.15.1+ が必要です。** 0.14.2 は非対応です。初回設定時や
+未知のコマンドが出たときにバージョンを確認し、0.15.1 未満なら公式インストーラーで更新します。
+未知のコマンド/引数なら停止し、再ログイン、追加 OAuth、token ファイルで回避しません。
+ログイン済みで管理されたネイティブ引数があれば、完全な名前を直接 connect に渡します。
+毎回の version/status/doctor/hosts は不要です。一覧のページングは別名や同名の曖昧さの解決用です。
+Soul を限定した recall は Runtime 0.15.4 以降、最初のメッセージの hook source 修正は 0.15.5 です。
+実際のネイティブ情報が得られるまで推測しません。
 
 0.15.0 は有効な従来の PostgreSQL wire Soul UID を拒否する場合があります。0.15.1+ に更新し、
 返された Host ID と `soul_uid` はそのまま使います。古い検証を回避するために識別子を書き換えたり、
@@ -81,12 +83,14 @@ token ファイルで回避しません。明示的なリモート/operator 接�
 | 数値 ID で接続 | `37soul connect --host <id> --agent <kind> --session <native-id>` |
 | 接続後に身元を読む | `37soul whoami --host <id> [--agent <kind>] [--profile <id>]` |
 
-実行の流れです。プレースホルダーは管理された hook の正確な引数でのみ置き換えます:
+ログイン済みで「Sophia Ramirez に接続し、私の好みを調べて」と頼まれた場合、hook の正確な
+引数で直接接続します。成功後だけ、返された `host.id` を `<returned-host-id>` に入れて検索します:
 ```text
-37soul login
-37soul hosts --name "Sophia Ramirez"
 37soul connect --name "Sophia Ramirez" --agent <kind> --session <native-id>
+37soul recall --host <returned-host-id> --kind relationship
 ```
+返された身元を使い、`whoami` は繰り返しません。検索だけなら既知の対象 ID/UID を使い、
+セッションに接続された Soul を切り替えません。
 
 `hosts` は現在の scoped credential を内部で使い、自分の所有する Soul の ID、名前、
 `soul_uid` だけを返します。身元や記憶は読みません。両方の名前コマンドは表示名の前後の
@@ -120,6 +124,14 @@ Sophia / 索菲亚 のような呼び名や名前の一部なら、名前で絞�
 任意の agent/profile は信頼できる情報からだけ渡します。アカウントの資格情報がない/取り消された
 場合は通常の `37soul login`、未接続の Soul には明示的な `connect` を使います。未知のコマンドは
 上のバージョン要件に従って停止し、再ログインや追加リモート OAuth で回避しません。
+
+検索は返された `--host <id>` または `--soul <uid>` に限定し、好みは `--kind relationship` で
+絞ります。0 件やエラーでも引数なしの `recall` や `--all` に広げません。`--all` はユーザーが
+Soul 横断検索を明示したときだけです。候補と履歴はその状態を明記し、限られたローカル結果から
+全体を調べ尽くしたと断言しません。無料の 30 日制限は会話への注入/サイトの方針であり、ローカル
+recall の日付制限ではありません。古い記録も検索でき、`--history` は日付でなく状態を切り替えます。
+source がない場合は停止し、次の管理されたメッセージを待ちます。接続の反復、再ログイン/OAuth、
+再起動、セッションの推測はしません。
 
 **Gemini と Cursor:** hook はネイティブセッション形式に対応しますが、安全でツールを
 使わないネイティブ呼び出しが実証されるまで、自動抽出は利用できません。hook 対応や身元の

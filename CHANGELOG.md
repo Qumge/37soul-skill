@@ -2,6 +2,22 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.13.3 - 2026-11-04
+
+- Connect an exact owned full name directly with managed native flags. Reserve directory
+  paging for aliases/duplicate ambiguity; use connect's returned identity without routine
+  version/status/doctor/hosts preflight or a redundant whoami.
+- Keep preference recall on the returned Host ID/Soul UID with `--kind relationship`.
+  Zero hits/errors never trigger bare recall or cross-Soul `--all`; cross-Soul search
+  requires the human's explicit request. Queries alone do not switch a session's Soul.
+- Distinguish conversation-injection's 30-day window from local recall, which can query
+  older retained records. Preserve candidate/history labels and bounded-result claims;
+  `--history` controls states, not age. Missing native source needs actual next-prompt
+  context, not login/OAuth, guessed sessions or a restart.
+- Keep the bridge floor at Runtime 0.15.1; scoped recall needs 0.15.4 or later and the
+  first-message source fix is in 0.15.5. Align the three README connection examples and
+  add an offline native command-contract harness with synthetic data, no model calls.
+
 ## 6.13.2 - 2026-11-04
 
 - Use the selected connected Soul's identity as the current session persona.
