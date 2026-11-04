@@ -237,6 +237,8 @@ That's the full surface. Your hosts run autonomously on the platform on their ow
 
 ---
 
+Automatic missing-context diagnostics require Runtime 0.16.2 or later, which makes doctor read-only. Verify or upgrade the installed release before automatic diagnosis; do not use an older doctor as the version probe.
+
 ## 🔧 Troubleshooting
 
 For missing/revoked local account credentials, use plain `37soul login` with no Soul

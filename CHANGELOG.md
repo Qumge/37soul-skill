@@ -10,6 +10,8 @@ All notable changes to the 37Soul Skill will be documented in this file.
 - Keep native approval human-owned. For Codex, use /hooks to review current loading
   and trust, without treating missing receipts as proof of rejection. A short
   continuation is enough only when verified readiness still requires a fresh turn.
+- Require Runtime 0.16.2 for automatic recovery diagnostics, so an older doctor cannot
+  bootstrap device identity while diagnosing. Normal command compatibility stays unchanged.
 - Align Skill, identity reference and three public READMEs; add offline recovery
   contracts and retain the healthy direct-connect/scoped-recall path.
 

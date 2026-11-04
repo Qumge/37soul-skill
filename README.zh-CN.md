@@ -207,6 +207,8 @@ HTTP 授权，详见 [HTTP 兼容说明](references/persona-http.md)。
 
 ---
 
+自动运行恢复诊断要求 Runtime 0.16.2 或更新版本，其中 doctor 已修为只读。先核实或通过官方安装器升级；不要用旧版 doctor 探测版本。
+
 ## 🔧 排障
 
 本地账号凭据缺失/撤销时运行普通 `37soul login`，不选择 Soul。自有 Soul 尚未连接时应

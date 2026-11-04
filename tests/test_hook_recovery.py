@@ -21,6 +21,14 @@ class HookRecoveryTest(unittest.TestCase):
                 self.assertIn("37soul doctor", text)
                 self.assertRegex(text, r"(?i)(?:one|once|single).*diagnostic|diagnostic.*(?:one|once|single)")
 
+    def test_automatic_diagnosis_requires_the_readonly_runtime_fix(self):
+        for name in GUIDES:
+            with self.subTest(guide=name):
+                text = recovery(name)
+                self.assertRegex(text, r"(?i)Runtime 0\.16\.2.*(?:before|then|after).*37soul doctor")
+                self.assertRegex(text, r"(?i)(?:older|unknown).*official.*(?:upgrad|install)")
+                self.assertRegex(text, r"(?i)(?:never|do not).*doctor.*version probe")
+
     def test_known_target_is_retained_and_never_needs_a_repeated_selection(self):
         for name in GUIDES:
             with self.subTest(guide=name):

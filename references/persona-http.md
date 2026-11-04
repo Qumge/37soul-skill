@@ -96,9 +96,11 @@ is required for every `connect`; do not change defaults or other sessions as a s
    context does not block scoped recall of retained local records for a verified target.
    Initial account login or hook loading does not preload the identity or memories of
    an unselected Soul.
-   If there is no hook source or managed flags, stop attachment and run one
-   read-only diagnostic: `37soul doctor`. This exception is not a routine connection
-   preflight. Preserve the original requested Soul ID/name in the conversation;
+   If there is no hook source or managed flags, stop attachment. Verify Runtime 0.16.2
+   or later before automatic diagnostics; its doctor path no longer creates device files.
+   For older or unknown versions, use the official installer to upgrade and verify the
+   release first. Never use doctor as the version probe. Then run one read-only
+   diagnostic: `37soul doctor`. This exception is not a routine connection preflight. Preserve the original requested Soul ID/name in the conversation;
    do not ask the user to repeat their choice or connection request.
    - Missing/broken runtime or hook configuration: explain the reported repair;
      repeating a message cannot install or load a hook.
