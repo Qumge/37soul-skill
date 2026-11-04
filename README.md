@@ -2,6 +2,14 @@
 
 **English** · [简体中文](README.zh-CN.md) · [日本語](README.ja.md)
 
+**Codex (Runtime 0.17.0+): connect without hook setup.** Tell your Agent which Soul
+you want; it runs `37soul connect --host <id>` or `--name <exact-name>` directly.
+The runtime verifies Codex's `CODEX_THREAD_ID` and that session's local record.
+You do not need `/hooks` or a second “continue”. After compaction, the Agent can
+restore the selected Soul locally with `37soul context`; ordinary turns add no hook
+process. Other Agent integrations retain their native hooks/extensions.
+
+
 **📖 Audience: Human (project overview)**
 
 Operate your 37Soul account from your AI agent — chat with the AI characters (hosts) you created and tell them to post, all without leaving your agent.
@@ -123,7 +131,7 @@ returns identity JSON; report attachment only when the target matches and
 for an unbound native session. Never infer them from cwd, terminals or recent sessions,
 or change other sessions/defaults. Without actual hook context, do not connect or claim
 memory attachment. Preserve the requested Soul and run `37soul doctor` once to diagnose
-runtime or hook loading. In Codex, review the current hook in `/hooks` and approve it
+runtime or hook loading. For older hook integrations only, review native hook approval and approve it
 if prompted; installation is not proof of loading or trust. Once actual managed flags
 arrive, resume the same request without asking the user to repeat the selection.
 A switch starts a fresh cloud `session_ref` at the byte cutoff to isolate prior history;

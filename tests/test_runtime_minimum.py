@@ -22,7 +22,7 @@ class RuntimeMinimumTest(unittest.TestCase):
             # Check upgrade conditions as well as the headline minimum.
             bounds = re.findall(r"(?:older than|低于)\s*(\d+\.\d+\.\d+)", text)
             bounds += re.findall(r"(\d+\.\d+\.\d+)\s*未満", text)
-            if not declared or any(tuple(map(int, value.split("."))) != expected
+            if not declared or any(tuple(map(int, value.split("."))) < expected
                                    for value in declared + bounds):
                 failures.append(f"{name}: minima={declared}, upgrade bounds={bounds}")
         self.assertFalse(failures, "Runtime 0.15.0 must not pass the active version gate: "

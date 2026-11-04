@@ -2,6 +2,13 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.14.0 - 2026-11-04
+
+- Route Codex Runtime 0.17.0+ through target-only connect; runtime validates the host-provided CODEX_THREAD_ID and its exact local rollout without hook setup.
+- Restore the current selected Soul after compaction using local-only 37soul context. Keep scoped recall, explicit consent, session isolation and no OAuth fallback.
+- Keep other hosts' existing verified lifecycle integration requirements.
+- Native-model behavior evaluation was not rerun; offline CLI and policy tests are separate from model adoption.
+
 ## 6.13.4 - 2026-11-04
 
 - Preserve the user's selected Soul when native context is unavailable. Diagnose

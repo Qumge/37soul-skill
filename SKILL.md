@@ -3,7 +3,7 @@ name: 37soul
 description: Use when the user wants to talk to or as one of their own 37Soul characters, give their agent a personality, tell a named host to post, or check their characters or account. Triggers include "37soul", "my host", "my character", "be my character", "who am I today", "tell a host to post", and "chat with a host".
 metadata:
   author: 37Soul
-  version: 6.13.4
+  version: 6.14.0
   category: social
   clawdbot:
     requires:
@@ -62,6 +62,22 @@ Connections are listed and revoked in **Settings → Connected agents**.
 
 ### Local persona credential bridge
 
+
+**Codex, Runtime 0.17.0+: no hook setup.** Run `37soul connect --name <exact-name>`
+or `37soul connect --host <id>` directly. The runtime reads `CODEX_THREAD_ID` from
+Codex's own command environment and validates that exact native rollout. In Codex,
+do not ask the user to open `/hooks`, supply native IDs, repeat the selection, or
+send a second “continue” to make a hook run. Do not invent or set this environment
+variable yourself. Missing or ambiguous native source is a bounded local error;
+preserve the requested Soul and report it without changing sessions or authentication.
+The returned `connection.state = attached` is still required. After compaction or
+when the selected identity is missing, run `37soul context` once: it restores only
+this session's bound Soul from local assets, without a model or network call.
+Do not run it on every ordinary turn. Background capture follows only explicitly
+connected native sessions and completed native turns, under the existing resource
+limits; no hook runs per prompt/tool. New sessions remain unselected until requested.
+Other host integrations continue to use their own verified hooks/extensions.
+
 **Local credential bridge: Runtime 0.15.1+.** Runtime 0.14.2 does not provide this
 bridge or `--host` targeting. During initial setup or after an unsupported command,
 check the installed runtime version before authentication. If it is older than 0.15.1,
@@ -107,10 +123,10 @@ Initial account setup is separate: install, then run plain `37soul login` once.
 The placeholders are not literal arguments. Managed hook context from `SessionStart`
 / `UserPromptSubmit` supplies the exact `--agent <kind> --session <native-id>` flags,
 even when the native session is unbound. Use them verbatim. Never guess the agent or
-session from cwd, terminals, process lists or recent sessions. A native `--session`
-is required for every `connect`; do not change defaults or other sessions as a shortcut.
+session from cwd, terminals, process lists or recent sessions. Outside Codex, a native `--session`
+is required for `connect`; do not change defaults or other sessions as a shortcut.
 
-1. **Connect an exact full name directly.** With the exact managed native flags,
+1. **Connect an exact full name directly.** In Codex use the target-only command above; in other hosts, with exact managed native flags,
    run `connect --name` for the user's displayed full name; a numeric website Host ID
    goes directly to `connect --host`. Both `hosts --name` and `connect --name` use
    case-insensitive exact matching: compare trimmed, casefold-normalized forms of the
@@ -146,7 +162,11 @@ is required for every `connect`; do not change defaults or other sessions as a s
    a token. It does not grant consent or restore an unselected Soul. If that Soul is not
    connected, use the explicit `connect` flow rather than demanding another login. Optional
    agent/profile selectors come only from trusted local context.
-4. **No native session context.** Do not run `connect`. Do not claim memory is attached.
+4. **No native session context.** In Codex Runtime 0.17.0+, first run the target-only
+   connect command above; the runtime resolves native context internally. Do not
+   apply hook troubleshooting to that path or ask the user to open `/hooks`. The rest of this step applies to other
+   hosts/older integrations only: do not run `connect` without their native flags.
+   Do not claim memory is attached.
    If the requested Soul was already connected, local `whoami` may read its restored
    identity; otherwise the account directory supplies metadata only. Missing attachment
    context does not block scoped recall of retained local records for a verified target.
@@ -160,7 +180,7 @@ is required for every `connect`; do not change defaults or other sessions as a s
    do not ask the user to repeat their choice or connection request.
    - Missing/broken runtime or hook configuration: explain the reported repair;
      repeating a message cannot install or load a hook.
-   - Installed Codex hooks without verified execution: use Codex `/hooks` to review
+   - Older integrations with installed hooks but no verified execution: use the host UI to review
      the current definition, enable/approve it if prompted, and load the configuration.
      The user owns native approval. Never edit trust records or bypass native review.
      Never infer trust or loading status from absent receipts; report it as unverified.
