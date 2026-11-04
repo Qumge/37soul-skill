@@ -96,13 +96,24 @@ is required for every `connect`; do not change defaults or other sessions as a s
    context does not block scoped recall of retained local records for a verified target.
    Initial account login or hook loading does not preload the identity or memories of
    an unselected Soul.
-   If there is no hook source, tell the user to send their next message so
-   `UserPromptSubmit` can supply source context, then retry with its exact flags.
-   The same applies when connect reports missing source despite flags being present:
-   stop this attempt; repeating connect cannot create the source. Do not run login,
-   OAuth, restart, or switch terminals/Souls to repair it. Never infer a terminal
-   session or request a restart. Until context is actually available, remain honest
-   that attachment did not succeed.
+   If there is no hook source or managed flags, stop attachment and run one
+   read-only diagnostic: `37soul doctor`. This exception is not a routine connection
+   preflight. Preserve the original requested Soul ID/name in the conversation;
+   do not ask the user to repeat their choice or connection request.
+   - Missing/broken runtime or hook configuration: explain the reported repair;
+     repeating a message cannot install or load a hook.
+   - Installed Codex hooks without verified execution: use Codex `/hooks` to review
+     the current definition, enable/approve it if prompted, and load the configuration.
+     The user owns native approval. Never edit trust records or bypass native review.
+     Never infer trust or loading status from absent receipts; report it as unverified.
+   - Flags present but connect still reports missing source: diagnose once, retain
+     the target, and stop; another session's evidence cannot supply this session's source.
+   Only after native trust/loading is verified, if the host needs a next normal turn
+   to refresh context, a short “continue” is sufficient. Resume the same original
+   request with the exact newly supplied flags. No retry loop or repeated selection.
+   Do not run login/OAuth, guess flags, switch terminals/Souls, or request a blanket
+   restart to repair missing context. Until actual context and an attached result are
+   available, state that connection has not succeeded.
 5. **Account credentials missing or revoked.** Run plain `37soul login`, with no Soul
    selection, then retry the requested directory/connect operation. This is account
    recovery, not per-Soul approval. A previously revoked/disabled Soul consent remains
@@ -132,7 +143,7 @@ queried locally without claiming that this connection succeeded.
 | Result or pressure | Next action |
 | --- | --- |
 | No hits, query error, or target absent locally | Explain that scoped local result/error; keep the same target. Do not infer that she has no preferences elsewhere. |
-| Missing native context/source | Stop attachment and use the next managed prompt's context; no repeat login/OAuth or restart. |
+| Missing native context/source | Preserve the chosen Soul; diagnose once with `37soul doctor`, verify native trust/loading, then resume the same request with actual context. No repeated selection or login/OAuth. |
 | Tempted to “find something anywhere” | Never use bare `37soul recall` or `--all` as an automatic fallback for a known/named target, zero hits or errors. |
 | Human explicitly requests cross-Soul search | Only then use `37soul recall --all`; preserve each hit's Soul attribution. |
 

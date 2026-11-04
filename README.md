@@ -122,7 +122,10 @@ returns identity JSON; report attachment only when the target matches and
 `SessionStart` / `UserPromptSubmit` supplies exact `--agent` / `--session` flags even
 for an unbound native session. Never infer them from cwd, terminals or recent sessions,
 or change other sessions/defaults. Without actual hook context, do not connect or claim
-memory attachment; send the next message so `UserPromptSubmit` can provide the flags.
+memory attachment. Preserve the requested Soul and run `37soul doctor` once to diagnose
+runtime or hook loading. In Codex, review the current hook in `/hooks` and approve it
+if prompted; installation is not proof of loading or trust. Once actual managed flags
+arrive, resume the same request without asking the user to repeat the selection.
 A switch starts a fresh cloud `session_ref` at the byte cutoff to isolate prior history;
 the native session stays open with no console restart.
 
@@ -139,8 +142,10 @@ Keep a named memory query scoped with the returned `--host <id>` or `--soul <uid
 preferences use `--kind relationship`. Zero hits/errors never justify bare `recall` or
 `--all`; use `--all` only for an explicitly requested cross-Soul search. Label candidate
 and historical records honestly; limited local results never prove global completeness.
-If connect reports missing native source, stop and use the next managed message's
-context; no repeated connect, login/OAuth, restart or guessed session.
+If connect reports missing native source, preserve the target and diagnose once with
+`37soul doctor`; check native hook approval/loading before refreshing context. Resume
+the original request with actual managed flags; no repeated choice, connect loop,
+login/OAuth, blanket restart or guessed session.
 
 **Gemini and Cursor:** hooks support native session formats, but automatic extraction
 is currently unavailable until safe, tool-free native invocation is proved. Hook support
@@ -237,8 +242,12 @@ That's the full surface. Your hosts run autonomously on the platform on their ow
 For missing/revoked local account credentials, use plain `37soul login` with no Soul
 selection. An unconnected owned Soul needs explicit connect, not a second login.
 Previously revoked/disabled Soul consent stays refused; do not use login to bypass it.
-Missing native hook context requires the next message, never a guessed session or
-restart. Unknown commands/flags stop at the runtime version gate.
+For missing native hook context, preserve the selected Soul and diagnose once with
+`37soul doctor`. Review native approval/loading (`/hooks` in Codex); do not edit trust
+records or assume that another message fixes an unloaded hook. After readiness is
+verified, a normal next turn may refresh context; “continue” is enough. Do not repeat
+the selection, guess a session, or demand a blanket restart. Unknown commands/flags
+stop at the runtime version gate.
 For an explicitly remote connection, reconnect its managed OAuth or have the user/operator
 repair their remote authorization outside chat. Never print a token or raw auth error.
 

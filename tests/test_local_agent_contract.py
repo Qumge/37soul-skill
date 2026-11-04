@@ -130,7 +130,7 @@ class LocalAgentContractTest(unittest.TestCase):
             "prompt hook": r"UserPromptSubmit",
             "unbound session context": r"even .*unbound",
             "explicit attachment acknowledgement": r"connection\.state == \"attached\"",
-            "next-message recovery": r"no hook source.*send .*next message",
+            "diagnosis before source retry": r"no hook source.*37soul doctor",
             "switch history isolation": r"fresh cloud .*session_ref.*byte cutoff",
             "no console restart": r"no console restart",
         }
@@ -184,7 +184,7 @@ class LocalAgentContractTest(unittest.TestCase):
 
     def test_skill_and_plugin_versions_match_latest_changelog(self):
         latest = re.search(r"^## (\d+\.\d+\.\d+) -", read("CHANGELOG.md"), re.M).group(1)
-        self.assertEqual(latest, "6.13.3", "Formal skill release version")
+        self.assertEqual(latest, "6.13.4", "Formal skill release version")
         versions = {
             "SKILL.md": re.search(r"^  version: (.+)$", read("SKILL.md"), re.M).group(1),
             "marketplace.json": json.loads(read("marketplace.json"))["version"],

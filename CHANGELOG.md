@@ -2,6 +2,17 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.13.4 - 2026-11-04
+
+- Preserve the user's selected Soul when native context is unavailable. Diagnose
+  runtime/hook readiness once before choosing recovery; never ask the user to repeat
+  the original connection request or infer another native session.
+- Keep native approval human-owned. For Codex, use /hooks to review current loading
+  and trust, without treating missing receipts as proof of rejection. A short
+  continuation is enough only when verified readiness still requires a fresh turn.
+- Align Skill, identity reference and three public READMEs; add offline recovery
+  contracts and retain the healthy direct-connect/scoped-recall path.
+
 ## 6.13.3 - 2026-11-04
 
 - Connect an exact owned full name directly with managed native flags. Reserve directory
