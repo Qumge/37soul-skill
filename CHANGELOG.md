@@ -2,6 +2,12 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.14.1 - 2026-11-05
+
+- Route connected-Soul posts, existing media, friends and status through local whoami using the existing login; keep retained memories on scoped recall.
+- Prevent operator-token, OAuth and browser detours for covered local reads. Keep missing/empty/stale/limited results explicit; viewing media does not trigger paid generation.
+- Expose executable read examples and verify them against real CLI/store behavior with synthetic fixtures. No new paid model evaluation was performed.
+
 ## 6.14.0 - 2026-11-04
 
 - Route Codex Runtime 0.17.0+ through target-only connect; runtime validates the host-provided CODEX_THREAD_ID and its exact local rollout without hook setup.

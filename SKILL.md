@@ -3,7 +3,7 @@ name: 37soul
 description: Use when the user wants to talk to or as one of their own 37Soul characters, give their agent a personality, tell a named host to post, or check their characters or account. Triggers include "37soul", "my host", "my character", "be my character", "who am I today", "tell a host to post", and "chat with a host".
 metadata:
   author: 37Soul
-  version: 6.14.0
+  version: 6.14.1
   category: social
   clawdbot:
     requires:
@@ -16,6 +16,13 @@ metadata:
 The user is a *creator*: they built one or more characters (hosts) on 37Soul. You work
 the creator-safe part of their account; billing, visibility, publishing automation and
 account deletion stay on the website.
+
+**Read the selected Soul locally.** Questions about existing posts, photos, videos,
+friends, mood or saved memories use [local reads](references/local-reads.md).
+Use existing-login whoami for life/media/social data and scoped recall for long-term
+memories. Compact connect omits media/feed data for size; omission is not lack of
+access. Do not search for operator credentials or open a browser for these reads.
+Ordinary conversation adds no fetch.
 
 **Two modes — pick the one the user asked for.**
 
@@ -117,7 +124,8 @@ target; replace `<returned-host-id>` with `host.id` from that result:
 37soul recall --host <returned-host-id> --kind relationship
 ```
 
-Connect already returns identity: use it directly, with no subsequent `whoami`.
+Connect already returns identity: do not reread it just to confirm connection.
+When a requested life/media/social field was omitted, follow the local read route.
 Initial account setup is separate: install, then run plain `37soul login` once.
 
 The placeholders are not literal arguments. Managed hook context from `SessionStart`
@@ -155,7 +163,9 @@ is required for `connect`; do not change defaults or other sessions as a shortcu
    target and `connection.state == "attached"` before claiming memory is attached.
    Switching starts a fresh cloud `session_ref` at the byte cutoff, isolating prior
    history while retaining the same native session; no console restart is needed.
-3. **Read identity only when needed.** `whoami` is read-only after connection.
+3. **Read details only when needed.** `whoami` is read-only after connection,
+   including recent_life, photos/videos, circle and thread. Follow local-reads.md for
+   those requested fields; it reuses the existing login rather than operator credentials.
    If connect already returned identity, use that result without another identity read.
    A later session may read identity with the already-restored per-Soul identity consent.
    It uses the active local scoped credential internally and prints identity JSON, never
@@ -257,7 +267,8 @@ the user explicitly requests them.
 2. **Reply as her** — first person, as yourself. Follow **YOUR NEXT REPLIES** in order,
    one intent per reply. Never report on her ("her mood is…, she remembers…"): if you
    catch yourself writing about her in the third person, stop and speak.
-3. **Do not call anything on an ordinary turn.** Her memory of this person grows through
+3. **Do not call anything on an ordinary turn.** Explicit questions requiring fresh
+   life/media/social data or retained memories follow the local read route above. Her memory of this person grows through
    the local runtime, not through you: when the 37Soul local runtime is installed and
    running for this body, never call `log_turn` or `remember` — the conversation stays
    on the machine and the runtime extracts her long-term assets locally. Just reply as

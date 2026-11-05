@@ -37,14 +37,20 @@ async function filesUnder(dir) {
   return result;
 }
 
-async function fixture(t) {
+async function fixture(t, {allowSnapshot=false}={}) {
   const sandbox = await mkdtemp(path.join(tmpdir(), 'skill-recall-contract-'));
   const root = path.join(sandbox, '.37soul');
   const oldHome = process.env.SOUL37_HOME;
   const oldFetch = globalThis.fetch;
   process.env.SOUL37_HOME = sandbox;
   let networkCalls = 0;
-  globalThis.fetch = async () => { networkCalls++; throw new Error('Network/provider forbidden in this harness'); };
+  globalThis.fetch = async (url, options={}) => {
+    networkCalls++;
+    if(!allowSnapshot)throw new Error('Network/provider forbidden in this harness');
+    assert.equal(String(url),'https://network-forbidden.invalid/api/v1/me/hosts/277/soul');
+    assert.equal(options.method,'GET');
+    return new Response(JSON.stringify({...identity,recent_life:[{text:'A retained public post',posted_at:'2026-08-12T00:00:00Z'}],photos:[{url:'https://public.invalid/photo.jpg'}],videos:[{url:'https://public.invalid/video.mp4'}],circle:[{nickname:'KnownFriend'}],thread:{text:'A photo essay'}}),{status:200});
+  };
   t.after(async () => {
     globalThis.fetch = oldFetch;
     if (oldHome === undefined) delete process.env.SOUL37_HOME; else process.env.SOUL37_HOME = oldHome;
@@ -59,6 +65,7 @@ async function fixture(t) {
   const asset = (id, owner, content, overrides = {}) => ({ asset_uid: id, soul_uid: owner, kind: 'relationship', trait: 'preference', content, applicability: '', tags: [], evidence: 'explicit_user_statement', verification: 'unverified', sensitivity: 'normal', state: 'active', revision: 1, supersedes_uid: null, pinned: false, source: { runtime_kind: 'claude-code', session_ref: 'synthetic', event_ref: id, occurred_at: '2020-01-01T00:00:00Z' }, sync_state: 'local_only', cloud_revision: null, ...overrides });
   try {
     await store.transact(draft => {
+      if(allowSnapshot){draft.owner_id='synthetic-owner';draft.cloud_device_uid='synthetic-cloud';draft.cloud_issuer='https://network-forbidden.invalid';draft.consents[`synthetic-cloud:${uid}`]={cloud_device_uid:'synthetic-cloud',soul_uid:uid,revision:1,categories:['identity','relationship','experience'],enabled:true};}
       draft.souls = { [uid]: soul(uid, 'Sophia Ramirez', 277), [otherUid]: soul(otherUid, 'Other Soul', 278) };
       draft.assets = {
         old: asset('old', uid, 'OLD_PREFERENCE prefers tea'),
@@ -69,12 +76,17 @@ async function fixture(t) {
       };
     });
   } finally { await store.close(); }
+  if(allowSnapshot){
+    await writeFile(path.join(root,'config.json'),JSON.stringify({active_profile_id:'synthetic',api_base_url:'https://network-forbidden.invalid',machine_id:'synthetic-machine',tokens:{},credentials:[{issuer:'https://network-forbidden.invalid',token:'SYNTHETIC-NOT-A-REAL-TOKEN',owner_id:'synthetic-owner',cloud_device_uid:'synthetic-cloud',runtime_kind:'claude-code',profile_id:'synthetic'}]}));
+    await writeFile(path.join(root,'accounts.json'),JSON.stringify({'synthetic-owner':{profile_id:'synthetic',cloud_issuer:'https://network-forbidden.invalid',default_soul_uid:otherUid,soul_sync_mode:'assets_only'}}));
+  }
   return async args => {
+    const callsBefore=networkCalls;
     const before = await filesUnder(sandbox);
     let stdout = '', stderr = '';
     const code = await main(args, { stdout: text => { stdout += text; }, stderr: text => { stderr += text; }, stdin: async () => { throw new Error('Interactive input forbidden'); } });
     assert.deepEqual(await filesUnder(sandbox), before, 'query must not change defaults, bindings or assets');
-    assert.equal(networkCalls, 0, 'no server/provider calls, including swallowed failures');
+    assert.equal(networkCalls-callsBefore,allowSnapshot&&args[0]==='whoami'?1:0,'one existing-login snapshot read; no operator/provider/browser fallback');
     return { code, stdout, stderr };
   };
 }
@@ -116,4 +128,20 @@ for (const doc of ['SKILL.md', 'references/persona-http.md', 'README.md', 'READM
     assert.match(history.stdout, /\[deleted\].*DELETED_PREFERENCE/);
     assert.doesNotMatch(history.stdout, /OTHER_SOUL_PREFERENCE|EXPERIENCE_METHOD/);
   });
+}
+
+for (const intent of ['life','media','circle','relationship','experience']) {
+ test(`local read guide: ${intent} executes a scoped read using the existing login`,async t=>{
+  const guide=await readFile(path.join(docsRoot,'references/local-reads.md'),'utf8').catch(()=>'');
+  const row=guide.split('\n').find(line=>new RegExp('^\\| '+intent+' \\|').test(line));assert.ok(row,`missing local ${intent} route`);
+  const command=row.match(/`(37soul [^`]+)`/)?.[1];assert.ok(command,'documented command must be executable');
+  const words=command.replaceAll('<selected-host-id>','277').replaceAll('<native-kind>','claude-code').split(' ');assert.equal(words.shift(),'37soul');assert.ok(!words.includes('--all'));assert.ok(!words.some(w=>w.includes('<')));
+  const run=await fixture(t,{allowSnapshot:true});const result=await run(words);assert.equal(result.code,0,result.stderr);
+  if(['life','media','circle'].includes(intent)){
+   assert.deepEqual(words,['whoami','--host','277','--agent','claude-code']);const full=JSON.parse(result.stdout);assert.equal(full.host.id,277);assert.equal(full.recent_life[0].posted_at,'2026-08-12T00:00:00Z');assert.equal(full.photos[0].url,'https://public.invalid/photo.jpg');assert.equal(full.circle[0].nickname,'KnownFriend');
+  }else{
+   assert.deepEqual(words,['recall','--host','277','--kind',intent]);assert.doesNotMatch(result.stdout,/OTHER_SOUL_PREFERENCE|DELETED_PREFERENCE/);assert.match(result.stdout,intent==='relationship'?/OLD_PREFERENCE/:/EXPERIENCE_METHOD/);
+  }
+  assert.ok(!result.stdout.includes('SYNTHETIC-NOT-A-REAL-TOKEN'));
+ });
 }

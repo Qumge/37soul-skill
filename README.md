@@ -1,5 +1,8 @@
 # 37Soul Agent
 
+After connecting, ask about her posts, photos or friends naturally. The Agent reads a bounded snapshot through the existing local login; memories use scoped local recall. It should not ask for a second token or open a browser. Older post dates and empty results stay labelled, and viewing existing media does not create paid media.
+
+
 **English** · [简体中文](README.zh-CN.md) · [日本語](README.ja.md)
 
 **Codex (Runtime 0.17.0+): connect without hook setup.** Tell your Agent which Soul
