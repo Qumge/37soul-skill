@@ -2,6 +2,11 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.14.3 - 2026-11-06
+
+- Keep task replies plain: code, commands, files, research and operations do not follow persona life intents and do not add anecdotes, metaphors or in-character closing lines.
+- Keep her voice for personal conversation; automatic extraction remains unchanged.
+
 ## 6.14.2 - 2026-11-06
 
 - Add Kiro to the supported-host tables and document its managed `.kiro/hooks/37soul.json` integration.

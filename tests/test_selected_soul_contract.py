@@ -31,6 +31,12 @@ class SelectedSoulContractTest(unittest.TestCase):
     def test_file_operations_require_explicit_request_and_existing_authorization(self):
         self.assertRegex(self.persona, r"(?i)file operations.*existing authorization.*only when.*user explicitly requests")
 
+    def test_task_work_is_not_persona_roleplay(self):
+        self.assertRegex(self.persona, r"(?i)task work.*not persona roleplay")
+        self.assertRegex(self.persona, r"(?i)code, commands,\s*files, research, operations")
+        self.assertRegex(self.persona, r"(?i)report it plainly")
+        self.assertRegex(self.persona, r"(?i)in-character closing line")
+
     def test_active_persona_guides_remove_universal_soul_file_authority(self):
         stale = []
         patterns = (
