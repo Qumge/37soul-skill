@@ -144,13 +144,13 @@ class LocalAgentContractTest(unittest.TestCase):
         match = re.search(r"(?i)\b(?:four|five|six|[0-9]+) runtimes\b", read("SKILL.md"))
         self.assertFalse(match, "Skill hardcodes an agent runtime count")
 
-    def test_gemini_cursor_hooks_do_not_promise_automatic_extraction(self):
+    def test_gemini_cursor_kiro_hooks_do_not_promise_automatic_extraction(self):
         text = " ".join(read("SKILL.md").split())
-        pattern = (r"Gemini and Cursor.*native session formats.*"
+        pattern = (r"Gemini, Cursor and Kiro.*native session formats.*"
                    r"automatic extraction is currently unavailable.*"
                    r"safe, tool-free native invocation")
         self.assertTrue(re.search(pattern, text, re.I),
-                        "Gemini/Cursor need an explicit hooks-only capability boundary")
+                        "Gemini/Cursor/Kiro need an explicit hooks-only capability boundary")
 
     def test_manifest_descriptions_keep_approval_callbacks_out_of_chat(self):
         marketplace = json.loads(read("marketplace.json"))
@@ -184,7 +184,7 @@ class LocalAgentContractTest(unittest.TestCase):
 
     def test_skill_and_plugin_versions_match_latest_changelog(self):
         latest = re.search(r"^## (\d+\.\d+\.\d+) -", read("CHANGELOG.md"), re.M).group(1)
-        self.assertEqual(latest, "6.14.1", "Formal skill release version")
+        self.assertEqual(latest, "6.14.2", "Formal skill release version")
         versions = {
             "SKILL.md": re.search(r"^  version: (.+)$", read("SKILL.md"), re.M).group(1),
             "marketplace.json": json.loads(read("marketplace.json"))["version"],

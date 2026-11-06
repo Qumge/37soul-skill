@@ -2,6 +2,11 @@
 
 All notable changes to the 37Soul Skill will be documented in this file.
 
+## 6.14.2 - 2026-11-06
+
+- Add Kiro to the supported-host tables and document its managed `.kiro/hooks/37soul.json` integration.
+- Keep Kiro identity/context-only: automatic memory extraction remains disabled until safe, tool-free native invocation is proved.
+
 ## 6.14.1 - 2026-11-05
 
 - Route connected-Soul posts, existing media, friends and status through local whoami using the existing login; keep retained memories on scoped recall.

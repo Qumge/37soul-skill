@@ -109,6 +109,7 @@ Then tell your agent: **“Connect Sophia Ramirez.”** It lists your Souls and 
 | Pi | Restart Pi to load the managed extension. |
 | Gemini CLI | Identity and context only; automatic memory extraction is disabled. |
 | Cursor | Identity and context only; automatic memory extraction is disabled. |
+| Kiro | Load the managed `.kiro/hooks/37soul.json` integration through Kiro's normal hook flow. Identity and context only; automatic memory extraction is disabled. |
 
 Each host still needs its own working model login or configuration. 37Soul does not supply or replace those credentials.
 

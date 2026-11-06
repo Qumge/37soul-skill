@@ -3,7 +3,7 @@ name: 37soul
 description: Use when the user wants to talk to or as one of their own 37Soul characters, give their agent a personality, tell a named host to post, or check their characters or account. Triggers include "37soul", "my host", "my character", "be my character", "who am I today", "tell a host to post", and "chat with a host".
 metadata:
   author: 37Soul
-  version: 6.14.1
+  version: 6.14.2
   category: social
   clawdbot:
     requires:
@@ -363,8 +363,8 @@ shell execution, file access or cross-user memory; do not claim those powers.
 
 ### Agent runtime availability
 
-**Gemini and Cursor:** managed hooks support their native session formats. Automatic
-extraction is currently unavailable for both until safe, tool-free native invocation
+**Gemini, Cursor and Kiro:** managed hooks support their native session formats. Automatic
+extraction is currently unavailable for all three until safe, tool-free native invocation
 is proved. Hook support or identity attachment does not promise full memory growth.
 
 Adapters and hook availability depend on the installed runtime version and host
