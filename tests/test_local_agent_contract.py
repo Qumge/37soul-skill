@@ -184,7 +184,7 @@ class LocalAgentContractTest(unittest.TestCase):
 
     def test_skill_and_plugin_versions_match_latest_changelog(self):
         latest = re.search(r"^## (\d+\.\d+\.\d+) -", read("CHANGELOG.md"), re.M).group(1)
-        self.assertEqual(latest, "6.14.3", "Formal skill release version")
+        self.assertEqual(latest, "6.15.0", "Formal skill release version")
         versions = {
             "SKILL.md": re.search(r"^  version: (.+)$", read("SKILL.md"), re.M).group(1),
             "marketplace.json": json.loads(read("marketplace.json"))["version"],
