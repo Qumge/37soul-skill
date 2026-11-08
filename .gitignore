@@ -46,3 +46,4 @@ yarn-error.log*
 *.temp
 
 .worktrees/
+__pycache__/
